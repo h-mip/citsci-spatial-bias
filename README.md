@@ -1,2 +1,2 @@
-# untangling-neighborhood-effects-code
-Code for paper: "Untangling neighborhoods effects in citizen science vector-mosquito surveillance"
+# Assessing and Correcting Neighborhood Socioeconomic Spatial Sampling Biases in Citizen Science Mosquito Data Collection: Code
+This repository contains the code used for the paper: "Assessing and Correcting Neighborhood Socioeconomic Spatial Sampling Biases in Citizen Science Mosquito Data Collection".
