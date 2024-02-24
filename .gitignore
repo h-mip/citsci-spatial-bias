@@ -1,3 +1,10 @@
+# data directory
+data
+
+# figures images and tex
+figures/*.png
+figures/*.tex
+
 # History files
 .Rhistory
 .Rapp.history
