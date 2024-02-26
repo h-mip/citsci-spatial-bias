@@ -422,6 +422,8 @@ make_drain_map = function(asdm_data_clean,
                           bcn_census_tract_polygons) {
   
   drains_yearly_buff200 = asdm_data_clean$drains_yearly_buff200
+
+  drains_activity_yearly_buff200 = asdm_data_clean$drains_activity_yearly_buff200
   
   map_data = drains_yearly_buff200 %>% filter(activity) %>% dplyr::select(id_item, year) %>% left_join(drains_activity_yearly_buff200)
   

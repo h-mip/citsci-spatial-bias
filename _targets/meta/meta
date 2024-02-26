@@ -1,16 +1,16 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.Random.seed|object|cfc14fadae7cd88f|||||||||||||||
+.Random.seed|object|9fe4e22129e02fba|||||||||||||||
 ages_file|stem|3c08deba26cf13fe|485967fca2e6ba27|ef46db3751d8e999|813478888|data/external/age-censusdis-1.1.17.csv|t19777.4181926978s|0669ba1358ed8a1c|321506|file|local|vector|||0||
 asdm_comparison_br2s|stem|458f251c6ec7f970|6fb9f8964fd2b6ad|bd3588b7bf8db12d|-183676043||t19779.4554316253s|a0252f4d8dc0f410|403|rds|local|vector|||0.744||
 asdm_comparison_loos|stem|fef68b977b7d5f38|51b4c57ea504334c|80f571458e3a36f0|-678844248||t19779.4554602908s|dde0b848d2784a9c|348707|rds|local|vector|||2.448||
 asdm_comparison_table|stem|182135c45f3ee271|a3c4c80f859c9cdf|7239d23562d39b57|7152220||t19779.463117144s|0b52c5847220add9|82|rds|local|vector|||0.581||
 asdm_comparisons|stem|2c5707cf6bec5725|eba4235fcab07577|1e4445d192e82219|-924129922||t19779.455420987s|6ab6228873d5fa09|765551129|rds|local|vector|||90.539||
-asdm_data_clean|stem|1f6a31b9c3f94c3a|0ff5618705c68684|9f789ca45ea27693|-1648467649||t19779.607651306s|b1adafa2810e5cfe|823892|rds|local|vector|||21.334||
-asdm_data_prep|function|fcc83cfc35be6195|||||||||||||||
+asdm_data_clean|stem|576f10bd95336af0|0ff5618705c68684|178fb6f3795b1a40|-1648467649||t19779.6293872666s|ecf16cbfa697090e|50309274|rds|local|vector|||21.889||
+asdm_data_prep|function|9e7229c8c4bc4ad2|||||||||||||||
 asdm_data_prep_a|function|ec4aec3a0a99406f|||||||||||||||
-asdm_main|stem|bb96fa05601d156d|cdfd7a3bea4698c9|f9f79021dc1feb09|-1754876526||t19779.6107508039s|3329df85dd0a37e7|30058026|rds|local|vector|||36.724||
+asdm_main|stem|63847460aeb4ea7f|cdfd7a3bea4698c9|9dff1886e3c28095|-1754876526||t19779.6300726389s|7393000643278153|79534290|rds|local|vector|||38.126||
 asdm_main_ces_plots|stem|17656ca132f3e9f7|3a59437c53efbc66|2785e0b38444ebd5|1174961143||t19778.9774223736s|a1c456b03adbfbf8|44|rds|local|vector|||2.415||
-asdm_robust|stem|c4ffd9483c2aac4a|b5875e8d4ec42070|6777f200d1891fb2|-1510523776||t19779.6103131849s|1ac7f38852b0c70e|2452649|rds|local|vector|||10.457||
+asdm_robust|stem|08296c0807ed7205|b5875e8d4ec42070|cea43373bfd83596|-1510523776||t19779.6295680426s|00d7ce7b121940e2|51937656|rds|local|vector|||10.846||
 asdm_robust_ces_plots|stem|17656ca132f3e9f7|7f2e9c1cea406240|194a7322ee00b9a3|-1763656556||t19778.9774411028s|a1c456b03adbfbf8|44|rds|local|vector|||1.514||
 avm_prediction_points|stem|c4c63d3658536a20|1e632c00e54e8350|80e30f948bcc063d|-496901095||t19779.3416182213s|1dc8d46c89d3cfd3|8654459|rds|local|vector|||93.055||
 bcn_ages_file|stem|3c08deba26cf13fe|485967fca2e6ba27|ef46db3751d8e999|-79884442|data/external/age-censusdis-1.1.17.csv|t19779.5954002763s|0669ba1358ed8a1c|321506|file|local|vector|||0||
@@ -32,7 +32,7 @@ data_clean|stem|4e35c9f032a7ed9f|6aaa4c6dc916da8a|df3f69b5e06492c0|-1454182835||
 ddf|function|ab72e083e22816aa|||||||||||||||
 drain_data|stem|b17ef02cf5ffe57f|ca8365379cd167ad|7dc4028d57364b79|362656322||t19779.5999947204s|5e2def8daba672ef|1593795|rds|local|vector|||0.63||
 drain_data_file|stem|4cdcf33c71d1e27f|22e1adae86fb5999|ef46db3751d8e999|396482140|data/aspb_private/dades_items_revisats_1-1-2019_31-12-2023.xlsx|t19779.597041712s|de2f9192f8d62723|11016834|file|local|vector|||0||
-drain_map|stem||16e9dfba8a6ac654|51bfe86b5b776de7|1130420656||t19779.6000059389s||0|rds|local|vector|||0.086||Object map_data is neither from class sf, stars, Spatial, nor Raster.
+drain_map|stem||16e9dfba8a6ac654|bc4e3b821fe73f62|1130420656||t19779.6000059389s||0|rds|local|vector|||0.015||object drains_activity_yearly_buff200 not found
 fit_asdm_comparisons|function|24c50b2c2df72c8f|||||||||||||||
 fit_asdm_main|function|cb63b3201d212d5f|||||||||||||||
 fit_asdm_robust_check|function|7dd5e6af39be630d|||||||||||||||
@@ -60,7 +60,7 @@ make_asdm_comparison_br2s|function|12c7465f66856f0a|||||||||||||||
 make_asdm_comparison_loos|function|457e63531343276f|||||||||||||||
 make_asdm_comparison_table|function|6a36da7571a245be|||||||||||||||
 make_bcn_characteristics|function|a045f90dcf9bb776|||||||||||||||
-make_drain_map|function|55f6eb6da5a95345|||||||||||||||
+make_drain_map|function|70e9a9c03d5d8450|||||||||||||||
 make_gpm_comparison_br2s|function|0497f7fc58d4b74e|||||||||||||||
 make_gpm_comparison_loos|function|b296a5e48fe5ebe1|||||||||||||||
 make_gpm_comparison_table|function|f0a81bfb28642f0a|||||||||||||||
@@ -119,7 +119,7 @@ make_gpm_comparison_table|function|f0a81bfb28642f0a
 fit_asdm_comparisons|function|24c50b2c2df72c8f
 make_asdm_comparison_loos|function|457e63531343276f
 make_bcn_characteristics|function|a045f90dcf9bb776
-.Random.seed|object|9fe4e22129e02fba
+.Random.seed|object|1f4f77f94222999d
 make_presence_absence_data|function|fb7456d7c060d3ec
 fit_mavm_main|function|824685fb324943d7
 fit_gpm_comparisons|function|333932f7e3642d6b
@@ -137,7 +137,7 @@ merge_datasets|function|9c683a5f16d8ff88
 get_drain_data|function|ba3e5d610d2da974
 make_mtvm_comparison_br2s|function|8720d3759bda0eff
 asdm_data_prep|function|9e7229c8c4bc4ad2
-make_drain_map|function|70e9a9c03d5d8450
+make_drain_map|function|026bf28dd2ca07cf
 fit_gpm_main|function|fcc4f628895dc7c1
 make_asdm_comparison_br2s|function|12c7465f66856f0a
 fit_mavm_main_no_se|function|063466a5eeecba62
@@ -155,5 +155,7 @@ chunkified_posterior_predict|function|309e9747014936d2
 fit_asdm_robust_check|function|7dd5e6af39be630d
 make_mavm_prediction_points|function|9579800fe69c540a
 prepare_mavm_data|function|b1e50edf3e88363d
-asdm_data_clean|stem|576f10bd95336af0|0ff5618705c68684|178fb6f3795b1a40|-1648467649||t19779.6293872666s|ecf16cbfa697090e|50309274|rds|local|vector|||21.889||
-asdm_robust|stem|08296c0807ed7205|b5875e8d4ec42070|cea43373bfd83596|-1510523776||t19779.6295680426s|00d7ce7b121940e2|51937656|rds|local|vector|||10.846||
+drain_map|stem|5d0426b981134c41|16e9dfba8a6ac654|096ab732820a5fad|1130420656||t19779.6319133201s|b3654bf3682c79ca|86|rds|local|vector|||0.875||
+gpm_main_ces_plots|stem|ce52f1547a4bf0d9|d7fbec653689618e|2257c6fa9825db4e|-2029242602||t19779.6319489494s|af2f698bb96276c8|148|rds|local|vector|||2.424||
+mtvm_comparison_table|stem|46d097c91391c6f9|066473da5510e6a1|cd0ef5863efbd5aa|-1342331845||t19779.6319552582s|f0d5811415b6b792|97|rds|local|vector|||0.084||
+asdm_robust_ces_plots|stem|17656ca132f3e9f7|7f2e9c1cea406240|cc95e8fc2fc6b5b1|-1763656556||t19779.6319938318s|a1c456b03adbfbf8|44|rds|local|vector|||2.11||
