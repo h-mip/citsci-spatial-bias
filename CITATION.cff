@@ -1,0 +1,24 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  Assessing and Correcting Neighborhood Socioeconomic
+  Spatial Sampling Biases in Citizen Science Mosquito Data
+  Collection: Code
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Álvaro
+    family-names: Padilla-Pozo
+  - given-names: John
+    family-names: Palmer
+repository-code: >-
+  https://github.com/h-mip/mosquito-citizen-science-neighborhood-sampling-bias-code
+abstract: >-
+  R code used for the paper: "Assessing and Correcting
+  Neighborhood Socioeconomic Spatial Sampling Biases in
+  Citizen Science Mosquito Data Collection."
+license: GPL-3.0
