@@ -142,7 +142,10 @@ list(
     gpm_main,
     fit_gpm_main(bcn_census_tract_polygons, data_clean)
   ),
-  tar_target(gpm_main_ces_plots, plot_gpm_main_ces(gpm_main)),
+  tar_target(
+    gpm_main_ces_plots, 
+    plot_gpm_main_ces(gpm_main)
+    ),
   tar_target(
     asdm_data_clean,
     asdm_data_prep(
@@ -153,7 +156,14 @@ list(
       data_clean
     )
   ),
-  #  tar_target(drain_map, make_drain_map(drains_yearly_buff200, bcn_perimeter_polygon, bcn_census_tract_polygons)),
+  tar_target(
+    drain_map, 
+    make_drain_map(
+      asdm_data_clean, 
+      bcn_perimeter_polygon, 
+      bcn_census_tract_polygons
+      )
+    ),
   tar_target(asdm_main, fit_asdm_main(asdm_data_clean)),
   tar_target(
     asdm_main_ces_plots,
@@ -180,7 +190,7 @@ list(
   tar_target(mavm_main_ces_plots, plot_mavm_ces(mavm_main)),
   tar_target(mavm_main_no_se, fit_mavm_main_no_se(mavm_data_clean)),
   tar_target(
-    avm_prediction_points,
+    mavm_prediction_points,
     make_mavm_prediction_points(
       mavm_main,
       mavm_main_no_se,

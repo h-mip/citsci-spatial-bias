@@ -14,7 +14,7 @@ library(ggeffects)
 library(MetBrewer)
 library(tidyverse)
 library(readxl)
-# library(tmap)
+library(tmap)
 library(mosquitoR)
 library(parallel)
 library(latticeExtra)
@@ -377,7 +377,7 @@ bcn_ssccs = census_tracts_merged
 # MALERT sampling effort 
 malert_se = malert_sampling_effort %>% mutate(year = year(date)) %>% group_by(TigacellID, year) %>% summarise(SE_expected = sum(SE_expected))
 
-# drains ####
+# drains
 drains_table_yearly = drain_data %>% dplyr::select(year =yyear, id_item = codi_svipla, geom = geometria, tipus_entitat, tipologia, n_activity_detections = num_rev_activitat, n_water_detections = num_rev_aigua) %>% mutate(activity = n_activity_detections>0, water = n_water_detections>0) %>% filter(!is.na(geom))
 
 drain_locations_wkb_character = drains_table_yearly %>% dplyr::select(id_item, geom) %>% distinct()
@@ -412,28 +412,34 @@ these_grouping_variables = c("id_item", "year", "water", "n_activity_detections"
 
 drains_activity_yearly_buff200 = drains_yearly_buff200 %>% filter(activity == TRUE) %>% st_join(adult_and_bite_reports %>% dplyr::select(year)) %>% mutate(report = if_else(year.x == year.y, TRUE,  FALSE)) %>% st_drop_geometry() %>% rename(year = year.x) %>% group_by_at(these_grouping_variables) %>% summarise(n_reports = sum(report), .groups = "drop") %>% replace_na(list(n_reports = 0)) %>% mutate(any_reports = n_reports > 0)
   
-  return(list("drains_activity_yearly_buff200"= drains_activity_yearly_buff200, "drain_locations" = drain_locations))
+  return(list("drains_activity_yearly_buff200"= drains_activity_yearly_buff200, "drain_locations" = drain_locations, "drains_yearly_buff200" = drains_yearly_buff200))
 
 }
 
 # Drain map ####
-# temporarily commenting out because of tmap issue in renv
-# make_drain_map = function(drains_yearly_buff200, bcn_perimeter_polygon, bcn_census_tract_polygons){
-# 
-# map_data = drains_yearly_buff200 %>% filter(activity) %>% dplyr::select(id_item, year) %>% left_join(drains_activity_yearly_buff200) 
-# 
-# this_pal = met.brewer(name = "Hiroshige", n = 10)
-# 
-# bcn_perimeter = bcn_perimeter_polygon
-# 
-# this_p = tm_shape(bcn_census_tract_polygons) + 
-#   tm_polygons(col = "#ffffbb", border.col = "#aaaaaa") + tm_shape(map_data) + 
-#   tm_dots(col = "any_reports", size = .1, pal = this_pal[ c(10, 1) ]) +
-#   tm_layout(frame = FALSE, legend.show = FALSE)
-# 
-# tmap_save(this_p, "figures/map_bcn_active_drains.png", dpi=600)
-# 
-# }
+make_drain_map = function(asdm_data_clean,
+                          bcn_perimeter_polygon,
+                          bcn_census_tract_polygons) {
+  
+  drains_yearly_buff200 = asdm_data_clean$drains_yearly_buff200
+  
+  map_data = drains_yearly_buff200 %>% filter(activity) %>% dplyr::select(id_item, year) %>% left_join(drains_activity_yearly_buff200)
+  
+  this_pal = met.brewer(name = "Hiroshige", n = 10)
+  
+  bcn_perimeter = bcn_perimeter_polygon
+  
+  this_p = tm_shape(bcn_census_tract_polygons) +
+    tm_polygons(col = "#ffffbb", border.col = "#aaaaaa") + tm_shape(map_data) +
+    tm_dots(col = "any_reports", size = .1, pal = this_pal[c(10, 1)]) +
+    tm_layout(frame = FALSE, legend.show = FALSE)
+  
+  this_filename = "figures/map_bcn_active_drains.png"
+  tmap_save(this_p, this_filename, dpi = 600)
+  
+  return(this_filename)
+  
+}
 
 # Main ASDM####
 fit_asdm_main = function(asdm_data_clean){
@@ -1303,3 +1309,4 @@ make_gpm_comparison_table = function(gpm_comparisons, gpm_comparison_loos, gpm_c
   return(this_filename)
   
 }
+
