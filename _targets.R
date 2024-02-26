@@ -50,24 +50,187 @@ tar_source()
 
 # Replace the target list below with your own:
 list(
-  tar_target(bcn_census_tract_file, "data/external/seccionado_2017/SECC_CE_20170101.shp", format = "file"),
+  tar_target(
+    bcn_census_tract_file,
+    "data/external/seccionado_2017/SECC_CE_20170101.shp",
+    format = "file"
+  ),
   tar_target(bcn_sociodem_file, "data/external/socecon.json", format = "file"),
   tar_target(bcn_income_file, "data/external/30896.json", format = "file"),
-  tar_target(bcn_socio_ec_file, "data/external/2020_atles_renda_index_gini.csv", format = "file"),
-  tar_target(bcn_housing_age_file, "data/external/2020_loc_hab_edat_mitjana.csv", format = "file"),
-  tar_target(urban_atlas_file, "data/external/urban_atlas_bcn/ES002L2_BARCELONA_UA2018_v012/Data/ES002L2_BARCELONA_UA2018_v012.gpkg", format = "file"),
-  tar_target(bcn_ages_file, "data/external/age-censusdis-1.1.17.csv", format = "file"),
-  tar_target(bcn_cens_incomes_file, "data/external/Medium.income_censusdis_BCN_2015-17.csv", format = "file"),
-  tar_target(landcover_data, get_urban_atlas_data(urban_atlas_file)),
-  tar_target(bcn_census_tract_polygons, get_bcn_census_tract_shapes(bcn_census_tract_file)),
-  tar_target(bcn_perimeter_polygon, generate_perimeter(bcn_census_tract_polygons)),
-  tar_target(malert_reports_all, get_malert_reports_all()),
-  tar_target(malert_reports_validated, get_malert_reports_albopictus_validated()),
-  tar_target(bcn_chars, make_bcn_characteristics(bcn_sociodem_file, bcn_income_file, bcn_socio_ec_file, bcn_housing_age_file)),
-  tar_target(census_tracts_merged, merge_census_tract_data(bcn_census_tract_polygons, bcn_chars)
+  tar_target(
+    bcn_socio_ec_file,
+    "data/external/2020_atles_renda_index_gini.csv",
+    format = "file"
   ),
-  tar_target(pres_abs_data, make_presence_absence_data(bcn_perimeter_polygon, malert_reports_all)),
-  tar_target(data_clean, merge_datasets(pres_abs_data, landcover_data, bcn_ages_file, bcn_cens_incomes_file, census_tracts_merged)),
-  tar_target(gpm_main, fit_gpm_main(bcn_census_tract_polygons, data_clean)),
-  tar_target(gpm_main_ces_plots, plot_gpm_main_ces(gpm_main))
+  tar_target(
+    bcn_housing_age_file,
+    "data/external/2020_loc_hab_edat_mitjana.csv",
+    format = "file"
+  ),
+  tar_target(
+    urban_atlas_file,
+    "data/external/urban_atlas_bcn/ES002L2_BARCELONA_UA2018_v012/Data/ES002L2_BARCELONA_UA2018_v012.gpkg",
+    format = "file"
+  ),
+  tar_target(
+    bcn_ages_file,
+    "data/external/age-censusdis-1.1.17.csv",
+    format = "file"
+  ),
+  tar_target(
+    bcn_cens_incomes_file,
+    "data/external/Medium.income_censusdis_BCN_2015-17.csv",
+    format = "file"
+  ),
+  tar_target(
+    drain_data_file,
+    "data/aspb_private/dades_items_revisats_1-1-2019_31-12-2023.xlsx",
+    format = "file"
+  ),
+  tar_target(ndvi_data_file, "data/aspb_private/NDVI_privat.shp", format = "file"),
+  tar_target(
+    bcn_bg_traps_file,
+    "data/malert_private/bcn_bg_traps.Rds",
+    format = "file"
+  ),
+  tar_target(bcn_bg_traps, get_bcn_bg_traps(bcn_bg_traps_file)),
+  tar_target(landcover_data, get_urban_atlas_data(urban_atlas_file)),
+  tar_target(
+    bcn_census_tract_polygons,
+    get_bcn_census_tract_shapes(bcn_census_tract_file)
+  ),
+  tar_target(ndvi, get_ndvi(ndvi_data_file)),
+  tar_target(
+    bcn_perimeter_polygon,
+    generate_perimeter(bcn_census_tract_polygons)
+  ),
+  tar_target(malert_reports_all, get_malert_reports_all()),
+  tar_target(
+    malert_reports_validated,
+    get_malert_reports_albopictus_validated()
+  ),
+  tar_target(malert_sampling_effort, get_malert_sampling_effort_data()),
+  tar_target(drain_data, get_drain_data(drain_data_file)),
+  tar_target(
+    bcn_chars,
+    make_bcn_characteristics(
+      bcn_sociodem_file,
+      bcn_income_file,
+      bcn_socio_ec_file,
+      bcn_housing_age_file
+    )
+  ),
+  tar_target(
+    census_tracts_merged,
+    merge_census_tract_data(bcn_census_tract_polygons, bcn_chars)
+  ),
+  tar_target(
+    pres_abs_data,
+    make_presence_absence_data(bcn_perimeter_polygon, malert_reports_all)
+  ),
+  tar_target(
+    data_clean,
+    merge_datasets(
+      pres_abs_data,
+      landcover_data,
+      bcn_ages_file,
+      bcn_cens_incomes_file,
+      census_tracts_merged
+    )
+  ),
+  tar_target(
+    gpm_main,
+    fit_gpm_main(bcn_census_tract_polygons, data_clean)
+  ),
+  tar_target(gpm_main_ces_plots, plot_gpm_main_ces(gpm_main)),
+  tar_target(
+    asdm_data_clean,
+    asdm_data_prep(
+      bcn_chars,
+      census_tracts_merged,
+      malert_sampling_effort,
+      drain_data,
+      data_clean
+    )
+  ),
+  #  tar_target(drain_map, make_drain_map(drains_yearly_buff200, bcn_perimeter_polygon, bcn_census_tract_polygons)),
+  tar_target(asdm_main, fit_asdm_main(asdm_data_clean)),
+  tar_target(
+    asdm_main_ces_plots,
+    plot_asdm_ces(asdm_main, "drain_model_M_final_CEs")
+  ),
+  tar_target(asdm_robust, fit_asdm_robust_check(asdm_data_clean)),
+  tar_target(
+    asdm_robust_ces_plots,
+    plot_asdm_ces(asdm_robust, "drain_model_M_final_spaced200m")
+  ),
+  tar_target(
+    mavm_data_clean,
+    prepare_mavm_data(
+      asdm_main,
+      malert_sampling_effort,
+      ndvi,
+      landcover_data,
+      census_tracts_merged,
+      bcn_chars,
+      malert_reports_validated
+    )
+  ),
+  tar_target(mavm_main, fit_mavm_main(mavm_data_clean)),
+  tar_target(mavm_main_ces_plots, plot_mavm_ces(mavm_main)),
+  tar_target(mavm_main_no_se, fit_mavm_main_no_se(mavm_data_clean)),
+  tar_target(
+    avm_prediction_points,
+    make_mavm_prediction_points(
+      mavm_main,
+      mavm_main_no_se,
+      bcn_perimeter_polygon,
+      ndvi,
+      census_tracts_merged,
+      landcover_data
+    )
+  ),
+  tar_target(
+    mtvm_main,
+    fit_mtvm_main(bcn_bg_traps, bcn_chars, census_tracts_merged, ndvi)
+  ),
+  tar_target(
+    mtvm_plots,
+    plot_mtvm_ces_plus_comparison(mtvm_main, mavm_main)
+  ),
+  tar_target(
+    mtvm_comparisons, 
+    fit_mtvm_comparisons(mtvm_main)
+  ),
+  tar_target(
+    mtvm_comparison_loos,
+    make_mtvm_comparison_loos(mtvm_comparisons)
+  ),
+  tar_target(
+    mtvm_comparison_br2s,
+    make_mtvm_comparison_br2s(mtvm_comparisons)
+  ),
+  tar_target(
+    mtvm_comparison_table,
+    make_mtvm_comparison_table(mtvm_comparisons, mtvm_comparison_loos, mtvm_comparison_br2s)
+  ),
+  tar_target(
+    mavm_comparisons, 
+    fit_mavm_comparisons(mavm_main)
+  ),
+  tar_target(
+    mavm_comparison_loos,
+    make_mavm_comparison_loos(mavm_comparisons)
+  ),
+  tar_target(
+    mavm_comparison_br2s,
+    make_mavm_comparison_br2s(mavm_comparisons)
+  ),
+  tar_target(
+    mavm_comparison_table,
+    make_mavm_comparison_table(mavm_comparisons, mavm_comparison_loos, mavm_comparison_br2s)
+  )
+  
+  
 )
+
