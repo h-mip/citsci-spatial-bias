@@ -1069,10 +1069,10 @@ fit_mavm_comparisons = function(mavm_main){
 # MAVM compasison loos ####
 make_mavm_comparison_loos = function(mavm_comparisons){
   
-  n_cores = min(length(mtvm_comparisons), parallel::detectCores())
+  n_cores = min(length(mavm_comparisons), parallel::detectCores())
   
   loos = mclapply(mavm_comparisons, function(M){
-    loo(M, moment_match = TRUE)
+    loo(M)
   }, mc.cores = n_cores)
   
   names(loos) = names(mavm_comparisons)
@@ -1105,9 +1105,9 @@ make_mavm_comparison_table = function(mavm_comparisons, mavm_comparison_loos, ma
   lcb_beta = as_tibble(print(loo_comparison, simplify = FALSE))
   lcb_beta$model =row.names(loo_comparison)
   
-  N = nrow(D)
+  N = nrow(mavm_comparisons[[1]]$data)
   
-  gof_tab = br2_comparison %>% select(Estimate, Est.Error, model) %>% rename(r2_est = Estimate, r2_se = Est.Error) %>% left_join(lcb_beta %>% select(elpd_loo, se_elpd_loo, model)) %>% arrange(model)
+  gof_tab = mavm_comparison_br2s %>% select(Estimate, Est.Error, model) %>% rename(r2_est = Estimate, r2_se = Est.Error) %>% left_join(lcb_beta %>% select(elpd_loo, se_elpd_loo, model)) %>% arrange(model)
   
   this_gof = lapply(model_names, function(this_model) {
     return(gof_tab %>% filter(model == this_model) %>% select(-model) %>% as.numeric())
@@ -1122,4 +1122,184 @@ make_mavm_comparison_table = function(mavm_comparisons, mavm_comparison_loos, ma
   mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex', gof = this_gof, gofnames = these_gof_names, custom.gof.rows = list("Spatial Autocorr." = c("icar", "icar", "none", "icar"), Observations = rep(N, length(models))), coefnames = these_coef_names, pointest="median", ci=.90, single.row=TRUE, sd=TRUE, custom.model.names = model_names, digits = 2, dcolumn = TRUE, use.packages = FALSE, center = FALSE, label = "tab:mavm", caption = "Parameter estimates for Mosquito Alert Vector Models.", file = this_filename)
   
   return(this_filename)
+}
+
+
+
+# ASDM comparisons ####
+fit_asdm_comparisons = function(asdm_main){
+ 
+  n_cores = parallel::detectCores()
+  n_chains = 4
+  threads_per_chain = n_cores/n_chains
+  
+  M6 = asdm_main
+  
+  D = M6$data
+  
+  M5 = brm(any_reports ~  SE_expected + poly(mean_rent_consumption_unit, 2) + log(popd) + p_singlehh + mean_age, data = D, family = bernoulli(link = "logit"), chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threads_per_chain, iter = 2000, silent = 0, control = list(adapt_delta = 0.97), save_pars = save_pars(all = TRUE))
+  
+  M4 = brm(any_reports ~  SE_expected + poly(mean_rent_consumption_unit, 2) + log(popd) + p_singlehh + (1 | id_item), data = D, family = bernoulli(link = "logit"), chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threads_per_chain, iter = 2000, silent = 0, control = list(adapt_delta = 0.97), save_pars = save_pars(all = TRUE))
+  
+  M3 = brm(any_reports ~  SE_expected + poly(mean_rent_consumption_unit, 2) + log(popd) + (1 | id_item), data = D, family = bernoulli(link = "logit"), chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threads_per_chain, iter = 2000, silent = 0, control = list(adapt_delta = 0.97), save_pars = save_pars(all = TRUE))
+  
+  M2 = brm(any_reports ~  SE_expected + poly(mean_rent_consumption_unit, 2) + (1 | id_item), data = D, family = bernoulli(link = "logit"), chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threads_per_chain, iter = 2000, silent = 0, control = list(adapt_delta = 0.97), save_pars = save_pars(all = TRUE))
+  
+  M1 = brm(any_reports ~ poly(mean_rent_consumption_unit, 2) + (1 | id_item), data = D, family = bernoulli(link = "logit"), chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threads_per_chain, iter = 2000, silent = 0, control = list(adapt_delta = 0.97), save_pars = save_pars(all = TRUE))
+  
+  models = list("ASDPM1" = M1, "ASDPM2" = M2, "ASDPM3" = M3, "ASDPM4" = M4, "ASDPM5" = M5, "ASDPM6" = M6)
+  
+  return(models)
+  
+}
+
+# ASDM comparison loos ####
+make_asdm_comparison_loos = function(asdm_comparisons){
+  
+  n_cores = min(length(asdm_comparisons), parallel::detectCores())
+  
+  loos = mclapply(asdm_comparisons, function(M){
+    loo(M)
+  }, mc.cores = n_cores)
+  
+  names(loos) = names(asdm_comparisons)
+  
+  return(loos) 
+
+}
+
+# ASDM comparison Bayes R sq ####
+make_asdm_comparison_br2s = function(asdm_comparisons){
+  
+  n_cores = min(length(asdm_comparisons), parallel::detectCores())
+  
+  bind_rows(mclapply(1:length(asdm_comparisons), function(i){
+    as_tibble(bayes_R2(asdm_comparisons[[i]])) %>% mutate(model=names(asdm_comparisons)[i])
+  }, mc.cores = n_cores))
+  
+  
+}
+
+# ASDM comparison table ####
+make_asdm_comparison_table = function(asdm_comparisons, asdm_comparison_loos, asdm_comparison_br2s){
+  
+  models = asdm_comparisons
+  
+model_names = names(models)
+
+loo_comparison = loo_compare(asdm_comparison_loos)
+
+lcb_beta = as_tibble(print(loo_comparison, simplify = FALSE))
+lcb_beta$model = row.names(loo_comparison)
+
+N = nrow(asdm_comparisons[[1]]$data)
+
+gof_tab = asdm_comparison_br2s %>% select(Estimate, Est.Error, model) %>% rename(r2_est = Estimate, r2_se = Est.Error) %>% left_join(lcb_beta %>% select(elpd_loo, se_elpd_loo, model)) %>% arrange(model)
+
+this_gof = lapply(model_names, function(this_model) {
+  return(gof_tab %>% filter(model == this_model) %>% select(-model) %>% as.numeric())
+})
+
+these_gof_names = lapply(1:length(models), function(x){ return(c("Bayes R-sq.", "SE Bayes R-sq.", "ELPD", "SE ELPD"))})
+
+these_coef_names = list(c("Int.", "INC", "INC sq." ),  c("Int.", "INC", "INC sq.", "SE"), c("Int.", "INC", "INC sq.", "SE", "POP"), c("Int.", "INC", "INC sq.", "SE", "POP", "PSH"), c("Int.", "INC", "INC sq.", "SE", "POP", "PSH", "AGE"), c("Int.", "INC", "INC sq.", "SE", "POP", "PSH", "AGE"))
+
+cust_rows = list("Random Intercepts" = c("drain", "drain", "drain", "drain", "none", "drain"), Observations = rep(N, length(models)))
+
+this_filename = "figures/drain_model_table.tex"
+
+mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex', gof = this_gof, gofnames = these_gof_names, custom.gof.rows = cust_rows, coefnames = these_coef_names, pointest="median", ci=.90, single.row=TRUE, sd=TRUE, custom.model.names = model_names, digits = 2, dcolumn = TRUE, use.packages = FALSE, center = FALSE, sideways = TRUE, label = "asdpm", caption = "Parameter estimates for Active Sewer Drain Participation Models.", file = this_filename)
+
+return(this_filename)
+
+}
+
+
+# GPM comparisons ####
+fit_gpm_comparisons = function(gpm_main){
+  
+  
+  n_cores = parallel::detectCores()
+  n_chains = 4
+  threads_per_chain = n_cores/n_chains
+  
+  M5 = gpm_main
+  
+  D = M5$data
+  D2 = M5$data2
+  
+  M4 = brm(presence ~ poly(mean_rent_consumption_unit, 2) + log(popd) + mean_age + p_singlehh + car(queens, gr=CUSEC, type="icar"), data = D, data2 = D2, family = bernoulli(link = "logit"), prior = set_prior("normal(0,2)", class="b"), chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threads_per_chain, iter = 2000, silent=0, save_pars = save_pars(all = TRUE))
+  
+  M3 = brm(presence ~ poly(mean_rent_consumption_unit, 2) + log(popd) + mean_age + car(queens, gr=CUSEC, type="icar"), data = D, data2 = D2, family = bernoulli(link = "logit"), prior = set_prior("normal(0,2)", class="b"), chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threads_per_chain, iter = 2000, silent=0, save_pars = save_pars(all = TRUE))
+  
+  M2 = brm(presence ~ poly(mean_rent_consumption_unit, 2) + log(popd) + car(queens, gr=CUSEC, type="icar"), data = D, data2 = D2, family = bernoulli(link = "logit"), prior = set_prior("normal(0,2)", class="b"), chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threads_per_chain, iter = 2000, silent=0, save_pars = save_pars(all = TRUE))
+  
+  M1 = brm(presence ~ poly(mean_rent_consumption_unit, 2) + car(queens, gr=CUSEC, type="icar"), data = D, data2 = D2, family = bernoulli(link = "logit"), prior = set_prior("normal(0,2)", class="b"), chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threads_per_chain, iter = 2000, silent=0, save_pars = save_pars(all = TRUE))
+
+  models = list("GPM1" = M1, "GPM2" = M2, "GPM3" = M3, "GPM4" = M4, "GPM5" = M5)
+  
+  return(models)
+}
+
+# GPM comparison loos ####
+make_gpm_comparison_loos = function(gpm_comparisons){
+  
+  n_cores = min(length(gpm_comparisons), parallel::detectCores())
+  
+  loos = mclapply(gpm_comparisons, function(M){
+    loo(M)
+  }, mc.cores = n_cores)
+  
+  names(loos) = names(gpm_comparisons)
+  
+  return(loos) 
+  
+}
+
+# GPM comparison BR2s ####
+make_gpm_comparison_br2s = function(gpm_comparisons){
+  
+  n_cores = min(length(gpm_comparisons), parallel::detectCores())
+  
+  bind_rows(mclapply(1:length(gpm_comparisons), function(i){
+    as_tibble(bayes_R2(gpm_comparisons[[i]])) %>% mutate(model=names(gpm_comparisons)[i])
+  }, mc.cores = n_cores))
+  
+}
+
+
+# GPM comparison table ####
+make_gpm_comparison_table = function(gpm_comparisons, gpm_comparison_loos, gpm_comparison_br2s){
+  
+  models = gpm_comparisons
+  
+  model_names = names(models)
+  
+  loo_comparison = loo_compare(gpm_comparison_loos)
+  
+  lcb_beta = as_tibble(print(loo_comparison, simplify = FALSE))
+  lcb_beta$model = row.names(loo_comparison)
+  
+  N = nrow(gpm_comparisons[[1]]$data)
+  
+  gof_tab = gpm_comparison_br2s %>% select(Estimate, Est.Error, model) %>% rename(r2_est = Estimate, r2_se = Est.Error) %>% left_join(lcb_beta %>% select(elpd_loo, se_elpd_loo, model)) %>% arrange(model)
+  
+  this_gof = lapply(model_names, function(this_model) {
+    return(gof_tab %>% filter(model == this_model) %>% select(-model) %>% as.numeric())
+  })
+  
+  these_gof_names = lapply(1:length(models), function(x){ return(c("Bayes R-sq.", "SE Bayes R-sq.", "ELPD", "SE ELPD"))})
+  
+  mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex')
+  
+  these_coef_names = list(c("Int.", "INC", "INC sq." ), c("Int.", "INC", "INC sq.", "POP"), c("Int.", "INC", "INC sq.", "POP", "AGE"), c("Int.", "INC", "INC sq.", "POP", "AGE", "PSH"), c("Int.", "INC", "INC sq.", "POP", "AGE", "PSH"))
+  
+  cust_rows = list("Spatial autocorr." = c("icar", "icar", "icar", "none", "icar"), Observations = rep(N, length(models)))
+  
+  this_filename = "figures/general_participation_model_table.tex"
+  
+  mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex', gof = this_gof, gofnames = these_gof_names, custom.gof.rows = cust_rows, coefnames = these_coef_names, pointest="median", ci=.90, single.row=TRUE, sd=TRUE, custom.model.names = model_names, digits = 2, dcolumn = TRUE, use.packages = FALSE, center = FALSE, label = "gpm", caption = "Parameter estimates for General Participation Models.", file = this_filename)
+  
+  return(this_filename)
+  
 }

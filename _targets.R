@@ -229,8 +229,23 @@ list(
   tar_target(
     mavm_comparison_table,
     make_mavm_comparison_table(mavm_comparisons, mavm_comparison_loos, mavm_comparison_br2s)
+  ),
+  tar_target(
+    asdm_comparisons, 
+    fit_asdm_comparisons(asdm_main)
+  ),
+  tar_target(
+    asdm_comparison_loos,
+    make_asdm_comparison_loos(asdm_comparisons)
+  ),
+  tar_target(
+    asdm_comparison_br2s,
+    make_asdm_comparison_br2s(asdm_comparisons)
+  ),
+  tar_target(
+    asdm_comparison_table,
+    make_asdm_comparison_table(asdm_comparisons, asdm_comparison_loos, asdm_comparison_br2s)
   )
-  
   
 )
 
