@@ -52,7 +52,7 @@ tar_source()
 
 # Replace the target list below with your own:
 list(
-  ## filenames ####
+  ## file names ####
   tar_target(
     bcn_census_tract_file,
     "data/external/seccionado_2017/SECC_CE_20170101.shp",
