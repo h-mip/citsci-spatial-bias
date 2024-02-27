@@ -87,13 +87,13 @@ list(
   ),
   tar_target(
     drain_data_file,
-    "data/aspb_private/dades_items_revisats_1-1-2019_31-12-2023.xlsx",
+    "data/private/dades_items_revisats_1-1-2019_31-12-2023.xlsx",
     format = "file"
   ),
-  tar_target(ndvi_data_file, "data/aspb_private/NDVI_privat.shp", format = "file"),
+  tar_target(ndvi_data_file, "data/private/NDVI_privat.shp", format = "file"),
   tar_target(
     bcn_bg_traps_file,
-    "data/malert_private/bcn_bg_traps.Rds",
+    "data/private/bcn_bg_traps.Rds",
     format = "file"
   ),
   ## loading data ####
