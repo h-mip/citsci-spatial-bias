@@ -1,5 +1,5 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.Random.seed|object|73f677954332071f|||||||||||||||
+.Random.seed|object|ad3c45ad3c2547a9|||||||||||||||
 ages_file|stem|3c08deba26cf13fe|485967fca2e6ba27|ef46db3751d8e999|813478888|data/external/age-censusdis-1.1.17.csv|t19777.4181926978s|0669ba1358ed8a1c|321506|file|local|vector|||0||
 asdm_comparison_br2s|stem|d66cef8181f2b5cb|6fb9f8964fd2b6ad|1b67b885af72a898|-183676043||t19779.6385549562s|e8f841da6aca5d39|402|rds|local|vector|||0.751||
 asdm_comparison_loos|stem|204350b08ab8cfb6|51b4c57ea504334c|ec2f2ae492f83f60|-678844248||t19779.6385863521s|c622365079d7dc30|348933|rds|local|vector|||2.689||
@@ -15,7 +15,7 @@ asdm_robust_ces_plots|stem|17656ca132f3e9f7|7f2e9c1cea406240|cc95e8fc2fc6b5b1|-1
 avm_prediction_points|stem|c4c63d3658536a20|1e632c00e54e8350|80e30f948bcc063d|-496901095||t19779.3416182213s|1dc8d46c89d3cfd3|8654459|rds|local|vector|||93.055||
 bcn_ages_file|stem|3c08deba26cf13fe|485967fca2e6ba27|ef46db3751d8e999|-79884442|data/external/age-censusdis-1.1.17.csv|t19779.5954002763s|0669ba1358ed8a1c|321506|file|local|vector|||0||
 bcn_bg_traps|stem|63017d71a61c2537|49c5f1ada2fe0d4a|1df28982807e456c|983315507||t19779.5999842506s|4f1854cea86b233c|64837|rds|local|vector|||0.003||
-bcn_bg_traps_file|stem|6907d33db802f7e1|4e5bd30b820f6680|ef46db3751d8e999|-119726035|data/malert_private/bcn_bg_traps.Rds|t19779.5990119594s|945ca295e3d95b88|1138674|file|local|vector|||0||
+bcn_bg_traps_file|stem|6907d33db802f7e1|1e08198e9cf64fa2|ef46db3751d8e999|-119726035|data/private/bcn_bg_traps.Rds|t19780.5126068042s|945ca295e3d95b88|1138674|file|local|vector|||0||
 bcn_cens_incomes_file|stem|99b60b9e534b57f2|92307368dd82ed28|ef46db3751d8e999|1452455600|data/external/Medium.income_censusdis_BCN_2015-17.csv|t19779.5957008328s|002d3035f61d07fd|406298|file|local|vector|||0||
 bcn_census_tract_file|stem|d927a95ee91d4a38|9af92043ffd100dc|ef46db3751d8e999|1873422525|data/external/seccionado_2017/SECC_CE_20170101.shp|t19779.5891928411s|4297818a3a69a510|110641224|file|local|vector|||0.001||
 bcn_census_tract_polygons|stem|42485576ed871036|2bbb04437c6351b5|b9c313ecbf15516b|1578372052||t19779.5996537039s|3c147c56a7e4b5fb|319100|rds|local|vector|||1.403||
@@ -32,7 +32,7 @@ data_clean|stem|4e35c9f032a7ed9f|6aaa4c6dc916da8a|df3f69b5e06492c0|-1454182835||
 ddf|function|ab72e083e22816aa|||||||||||||||
 descriptive_figures|stem|17656ca132f3e9f7|2339ffd9ccee493d|d60a64ccace96b3a|-1283049077||t19780.4640881593s|a1c456b03adbfbf8|44|rds|local|vector|||3.419||
 drain_data|stem|b17ef02cf5ffe57f|ca8365379cd167ad|7dc4028d57364b79|362656322||t19779.5999947204s|5e2def8daba672ef|1593795|rds|local|vector|||0.63||
-drain_data_file|stem|4cdcf33c71d1e27f|22e1adae86fb5999|ef46db3751d8e999|396482140|data/aspb_private/dades_items_revisats_1-1-2019_31-12-2023.xlsx|t19779.597041712s|de2f9192f8d62723|11016834|file|local|vector|||0||
+drain_data_file|stem|4cdcf33c71d1e27f|9d937f9d2c8f0ef4|ef46db3751d8e999|396482140|data/private/dades_items_revisats_1-1-2019_31-12-2023.xlsx|t19780.5127506954s|de2f9192f8d62723|11016834|file|local|vector|||0||
 drain_map|stem|5d0426b981134c41|16e9dfba8a6ac654|096ab732820a5fad|1130420656||t19779.6319133201s|b3654bf3682c79ca|86|rds|local|vector|||0.875||
 fit_asdm_comparisons|function|24c50b2c2df72c8f|||||||||||||||
 fit_asdm_main|function|cb63b3201d212d5f|||||||||||||||
@@ -103,7 +103,7 @@ mtvm_comparisons|stem|3766631a70679240|8ed69c6b59d0aa2c|64367a9db8a4fb72|1320146
 mtvm_main|stem|f6ff0b906d667294|4aac179834421407|0d596f109ea9d5b1|975692279||t19779.605667852s|c7ddc4013e14372d|20211189|rds|local|vector|||94.831||
 mtvm_plots|stem|b84e4a2fdf5c8589|b7d96de1fcfa458f|5f1278953f2f9e98|1165909729||t19779.6406812606s|82d1d1c4d23d6aba|150|rds|local|vector|||1.584||
 ndvi|stem|4809f8af538892c2|3a8edfc81e7ab9f5|15bd67ca2a016aac|-1844714063||t19779.5996657561s|81e12d5cfef550b6|8077936|rds|local|vector|||0.245||
-ndvi_data_file|stem|ea8e0520cdda0c19|a43e7b0c8fb36605|ef46db3751d8e999|-1805738969|data/aspb_private/NDVI_privat.shp|t19779.5968153375s|b12fd49c7890ce86|13284280|file|local|vector|||0||
+ndvi_data_file|stem|ea8e0520cdda0c19|5a3a506de3e6570d|ef46db3751d8e999|-1805738969|data/private/NDVI_privat.shp|t19780.5127506219s|b12fd49c7890ce86|13284280|file|local|vector|||0||
 plot_asdm_ces|function|eacbee18ef8848de|||||||||||||||
 plot_gpm_main_ces|function|d4d1c4b44ccef3db|||||||||||||||
 plot_mavm_ces|function|1861858d2cb9bddc|||||||||||||||
