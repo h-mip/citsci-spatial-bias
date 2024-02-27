@@ -15,6 +15,7 @@ library(MetBrewer)
 library(tidyverse)
 library(readxl)
 library(tmap)
+library(tmaptools)
 library(mosquitoR)
 library(parallel)
 library(latticeExtra)
@@ -647,7 +648,6 @@ return(list("W" = W, "data_se" = D, "data_no_se" = D_no_se))
 
 }
 
-
 # Main MAVM ####
 fit_mavm_main = function(mavm_data_clean){
   
@@ -760,7 +760,7 @@ make_mavm_prediction_points = function(mavm_main, mavm_main_no_se, bcn_perimeter
 }
 
 # MAVM prediction figures ####
-make_mavm_prediction_figures = function(prediction_points){
+make_mavm_prediction_figures = function(prediction_points, bcn_perimeter){
   
   these_filenames = NULL
   
@@ -840,6 +840,22 @@ make_mavm_prediction_figures = function(prediction_points){
   these_filenames = c(these_filenames, this_filename)
   
   ggsave(this_filename, width = 6, height = 6)
+  
+  return(these_filenames)
+}
+
+# MTVM trap map ####
+make_trap_map = function(bcn_bg_traps, bcn_census_tract_polygons){
+  
+  this_p = tm_shape(bcn_census_tract_polygons) + 
+    tm_polygons(col = "#ffffbb", border.col = "#aaaaaa") + tm_shape(bcn_bg_traps %>% dplyr::select(trap_name_lon_lat) %>% distinct()) + 
+    tm_dots(col = "#006d2c", size = .1) +
+    tm_layout(frame = FALSE, legend.show = FALSE)
+  
+  this_figure = "figures/map_bcn_bg_traps.png"
+  tmap_save(this_p, this_figure, dpi=600)
+  
+  return(this_figure)
   
 }
 
@@ -1309,6 +1325,97 @@ make_gpm_comparison_table = function(gpm_comparisons, gpm_comparison_loos, gpm_c
   mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex', gof = this_gof, gofnames = these_gof_names, custom.gof.rows = cust_rows, coefnames = these_coef_names, pointest="median", ci=.90, single.row=TRUE, sd=TRUE, custom.model.names = model_names, digits = 2, dcolumn = TRUE, use.packages = FALSE, center = FALSE, label = "gpm", caption = "Parameter estimates for General Participation Models.", file = this_filename)
   
   return(this_filename)
+  
+}
+
+# Descriptive Figures ####
+
+make_descriptive_figures = function(data_clean, bcn_chars, bcn_perimeter_polygon, bcn_census_tract_polygons){
+  
+  these_figures = NULL
+  
+  bcn_pop = bcn_census_tract_polygons %>% left_join(bcn_chars) %>% mutate(popd = population/(Shape_area/10000)) 
+  
+  bcn_pop <- bcn_pop %>% 
+    mutate(inctile = ntile(mean_rent_consumption_unit, 5),
+           singletile = ntile(p_singlehh, 5),
+           popdtile = ntile(popd, 5),
+           mean_housing_age_tile = ntile(mean_housing_age, 5),
+           p_spanish_tile = ntile(p_spanish, 5),
+           constant = 1)
+  
+
+  bcn_perimeter = bcn_perimeter_polygon
+  
+  D <- data_clean %>% 
+    filter(presence == T & type != "site") %>% 
+    mutate(presence = as.numeric(presence)) %>% 
+    st_transform(st_crs(bcn_perimeter)) %>%
+    st_filter(bcn_perimeter, .predicate = st_intersects)
+  
+  
+  # sampling cell grid
+  sampling_cells_small = st_make_grid(bcn_perimeter %>% st_transform(4326), cellsize = c(.025, .025), what = "polygons") %>% st_transform(st_crs(bcn_perimeter)) %>% st_intersection(bcn_perimeter)
+  
+  
+  this_figure = "figures/bcn_sampling_cells.png"
+  these_figures = c(these_figures, this_figure)
+  
+  ggplot(sampling_cells_small) + geom_sf()
+  ggsave(this_figure, width=6, height=6)
+  
+  
+  fig1A <- tm_shape(bcn_perimeter)+
+    tm_polygons(col = "#ffffbb", border.col = "#aaaaaa", lwd = .3)+
+    tm_shape(D)+
+    tm_dots("presence", col = "#003366", size = .05, border.lwd = 0, alpha = .3 )+
+    tm_layout(frame = FALSE, legend.show = FALSE)
+  
+  this_figure = "figures/fig1A.png"
+  these_figures = c(these_figures, this_figure)
+  
+  tmap_save(fig1A, filename = this_figure, dpi = 600)
+  
+  
+  fig1B <- tm_shape(bcn_pop)+
+    tm_polygons(col = "inctile", palette = viridisLite::viridis(5), lwd = .3, title = "Income", labels = c("10-19k", "19-22k", "22-25k", "25-29k", "29-51k"))+
+    tm_layout(legend.title.size = 1,
+              legend.text.size = .7)
+  
+  this_figure = "figures/fig1B.png"
+  these_figures = c(these_figures, this_figure)
+  
+  tmap_save(fig1B, filename = this_figure, dpi = 600)
+  
+  fig1C <- tm_shape(bcn_pop)+
+    tm_polygons(col = "singletile", palette = viridisLite::viridis(5), lwd = .3, title = "% One-person households", labels = c("16-28", "28-31", "31-34", "34-37", "37-48"))+
+    tm_layout(legend.title.size = .89,
+              legend.text.size = .7)
+  
+  this_figure = "figures/fig1C.png"
+  these_figures = c(these_figures, this_figure)
+  
+  tmap_save(fig1C, filename = this_figure, dpi = 600)
+  
+  fig1D <- tm_shape(bcn_pop)+
+    tm_polygons(col = "popdtile", palette = viridisLite::viridis(5), lwd = .3, title = "Population density", labels = c("1-222", "222-358", "358-460", "460-598", "598-1553"))+
+    tm_layout(legend.title.size = 1,
+              legend.text.size = .7)
+  
+  this_figure = "figures/fig1D.png"
+  these_figures = c(these_figures, this_figure)
+  
+  tmap_save(fig1D, filename = this_figure, dpi = 600)
+  
+  fig1E <- tm_shape(bcn_pop)+
+    tm_polygons(col = "p_spanish_tile", palette = viridisLite::viridis(5), lwd = .3, title = "% Spanish citizens", labels = c("19-75", "75-80", "80-84", "84-88", "88-98"))+
+    tm_layout(legend.title.size = 1,
+              legend.text.size = .7)
+  
+  this_figure = "figures/fig1E.png"
+  these_figures = c(these_figures, this_figure)
+  
+  tmap_save(fig1E, filename = this_figure, dpi = 600)
   
 }
 

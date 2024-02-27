@@ -1,5 +1,5 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.Random.seed|object|1f4f77f94222999d|||||||||||||||
+.Random.seed|object|73f677954332071f|||||||||||||||
 ages_file|stem|3c08deba26cf13fe|485967fca2e6ba27|ef46db3751d8e999|813478888|data/external/age-censusdis-1.1.17.csv|t19777.4181926978s|0669ba1358ed8a1c|321506|file|local|vector|||0||
 asdm_comparison_br2s|stem|d66cef8181f2b5cb|6fb9f8964fd2b6ad|1b67b885af72a898|-183676043||t19779.6385549562s|e8f841da6aca5d39|402|rds|local|vector|||0.751||
 asdm_comparison_loos|stem|204350b08ab8cfb6|51b4c57ea504334c|ec2f2ae492f83f60|-678844248||t19779.6385863521s|c622365079d7dc30|348933|rds|local|vector|||2.689||
@@ -30,6 +30,7 @@ census_tracts_merged|stem|473bc0aa1ba10730|52060d3e458a8b5b|88439da6fd1d7712|-68
 chunkified_posterior_predict|function|309e9747014936d2|||||||||||||||
 data_clean|stem|4e35c9f032a7ed9f|6aaa4c6dc916da8a|df3f69b5e06492c0|-1454182835||t19779.6057303194s|c6d06981ac36564f|1769600|rds|local|vector|||3.391||
 ddf|function|ab72e083e22816aa|||||||||||||||
+descriptive_figures|stem|17656ca132f3e9f7|2339ffd9ccee493d|d60a64ccace96b3a|-1283049077||t19780.4640881593s|a1c456b03adbfbf8|44|rds|local|vector|||3.419||
 drain_data|stem|b17ef02cf5ffe57f|ca8365379cd167ad|7dc4028d57364b79|362656322||t19779.5999947204s|5e2def8daba672ef|1593795|rds|local|vector|||0.63||
 drain_data_file|stem|4cdcf33c71d1e27f|22e1adae86fb5999|ef46db3751d8e999|396482140|data/aspb_private/dades_items_revisats_1-1-2019_31-12-2023.xlsx|t19779.597041712s|de2f9192f8d62723|11016834|file|local|vector|||0||
 drain_map|stem|5d0426b981134c41|16e9dfba8a6ac654|096ab732820a5fad|1130420656||t19779.6319133201s|b3654bf3682c79ca|86|rds|local|vector|||0.875||
@@ -52,6 +53,10 @@ get_malert_reports_all|function|57281763127b6f0d|||||||||||||||
 get_malert_sampling_effort_data|function|62e3f6170b34df5f|||||||||||||||
 get_ndvi|function|6b0a72efc9d5dbf1|||||||||||||||
 get_urban_atlas_data|function|a0d01793fb51906b|||||||||||||||
+gpm_comparison_br2s|stem|2811323eabc28689|61aeb3aa8a85e1c7|9d3e3949b2d98314|1055507410||t19780.4185259817s|c00122ae53f3dfad|352|rds|local|vector|||3.73||
+gpm_comparison_loos|stem|8c5048be345ecf07|fc5024eac46dc62c|3ca24c7e6083653f|288314524||t19780.418715073s|078bf5b2e6f3848c|1068635|rds|local|vector|||16.271||
+gpm_comparison_table|stem|1ccb1314d6a70806|c96bc4c81a0bf762|605e87280e670417|566786522||t19780.4187317093s|2005da2f14a67e22|98|rds|local|vector|||1.429||
+gpm_comparisons|stem|194682825ac07b66|de99d783e6a1f372|96714e5996a55b8e|1451994732||t19780.4184803664s|9a9c0376753c51b7|760510680|rds|local|vector|||183.924||
 gpm_main|stem|48e6572f564766ab|943d8f84e32ebe8a|c2018f0c5f0bcd81|1151099838||t19779.608248254s|c2f72cafaf29ffd4|56151667|rds|local|vector|||49.045||
 gpm_main_ces_plots|stem|ce52f1547a4bf0d9|d7fbec653689618e|2257c6fa9825db4e|-2029242602||t19779.6319489494s|af2f698bb96276c8|148|rds|local|vector|||2.424||
 incomes_file|stem|99b60b9e534b57f2|92307368dd82ed28|ef46db3751d8e999|-197991492|data/external/Medium.income_censusdis_BCN_2015-17.csv|t19777.420534363s|002d3035f61d07fd|406298|file|local|vector|||0||
@@ -60,6 +65,7 @@ make_asdm_comparison_br2s|function|12c7465f66856f0a|||||||||||||||
 make_asdm_comparison_loos|function|457e63531343276f|||||||||||||||
 make_asdm_comparison_table|function|6a36da7571a245be|||||||||||||||
 make_bcn_characteristics|function|a045f90dcf9bb776|||||||||||||||
+make_descriptive_figures|function|bbc8fa3d8b0e5631|||||||||||||||
 make_drain_map|function|026bf28dd2ca07cf|||||||||||||||
 make_gpm_comparison_br2s|function|0497f7fc58d4b74e|||||||||||||||
 make_gpm_comparison_loos|function|b296a5e48fe5ebe1|||||||||||||||
@@ -67,12 +73,13 @@ make_gpm_comparison_table|function|f0a81bfb28642f0a|||||||||||||||
 make_mavm_comparison_br2s|function|f18cd1d16fadd944|||||||||||||||
 make_mavm_comparison_loos|function|d978056fc3b78e98|||||||||||||||
 make_mavm_comparison_table|function|33392b8b74812a54|||||||||||||||
-make_mavm_prediction_figures|function|018e41241aa246e3|||||||||||||||
+make_mavm_prediction_figures|function|3a8c1e30cab4058e|||||||||||||||
 make_mavm_prediction_points|function|9579800fe69c540a|||||||||||||||
 make_mtvm_comparison_br2s|function|8720d3759bda0eff|||||||||||||||
 make_mtvm_comparison_loos|function|5f989730db710dc6|||||||||||||||
 make_mtvm_comparison_table|function|fa6cf15aee96ac87|||||||||||||||
 make_presence_absence_data|function|fb7456d7c060d3ec|||||||||||||||
+make_trap_map|function|3084dec3965f2ccf|||||||||||||||
 malert_reports_all|stem|f4ba814f85f07e4d|8076c8622a23e525|9d7331e11361327f|1367139907||t19779.5873796732s|33d8fbc6c21e7d09|80681|rds|local|vector|||0.544||
 malert_reports_validated|stem|5a81865bb6d54e7a|5689969636fbf140|b91f1fda9333d384|1336568438||t19779.5873850566s|5a16bf47296e54c6|13522|rds|local|vector|||0.452||
 malert_sampling_effort|stem|de6b714c12bae0ce|0b686d17fe436211|bc2065f77a4fb1da|342760466||t19779.587442068s|94e71bcacc0c8952|7982341|rds|local|vector|||3.225||
@@ -84,6 +91,7 @@ mavm_data_clean|stem|c1ac6a729874540a|094a85a09e7ffe79|fa24fbbbd291e198|-2006582
 mavm_main|stem|879266bad615e36b|81c3d6c623560b50|988c6ece1fcb86f3|430061098||t19779.6376941954s|8980b91673cb2dee|32409619|rds|local|vector|||75.741||
 mavm_main_ces_plots|stem|9e491b8bdd11df3f|45bd9c21f470d05d|80ae92721c03b97b|-1742730985||t19779.6406589529s|f3963c450082b208|143|rds|local|vector|||0.911||
 mavm_main_no_se|stem|adaa272b18440e76|d0cd314d35a4b607|0b518af9d7bf255b|-16652948||t19779.6385461227s|c8ea9601c4884438|32326984|rds|local|vector|||71.815||
+mavm_prediction_figures|stem|434b293d3bac3696|542266b838b09315|979fd683947ef912|-481530799||t19780.4419761585s|3c3e0d6d1d399035|184|rds|local|vector|||5.583||
 mavm_prediction_points|stem|0e2212014a9cb3fc|1e632c00e54e8350|4085b216cf1abb88|670811976||t19779.6417768792s|464b66be4f14ab20|8656051|rds|local|vector|||92.442||
 merge_census_tract_data|function|ec5aae88729399b8|||||||||||||||
 merge_datasets|function|9c683a5f16d8ff88|||||||||||||||
@@ -104,4 +112,5 @@ prepare_mavm_data|function|b1e50edf3e88363d|||||||||||||||
 pres_abs_data|stem|0cc3832f8d8481e2|c85a5dec017baa6c|35d7f65bf1bae0c8|1768991203||t19779.6000058142s|a7b07dc31409a2e0|187756|rds|local|vector|||0.803||
 pretty_ce_plot|function|c7211af8a2db0d56|||||||||||||||
 repos|object|d1db40a39f6f8bbf|||||||||||||||
+trap_map|stem|6f595b775355d6bc|7e37e039629a59cb|1175937f0ab65a35|1893139317||t19780.485083812s|e655bbbdcbba1d63|81|rds|local|vector|||0.571||
 urban_atlas_file|stem|26f28483d17cf2ee|b5a7cc207a5ecfb5|ef46db3751d8e999|1907190905|data/external/urban_atlas_bcn/ES002L2_BARCELONA_UA2018_v012/Data/ES002L2_BARCELONA_UA2018_v012.gpkg|t19779.5947023022s|9a54976fa52edb10|220762112|file|local|vector|||0||

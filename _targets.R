@@ -48,8 +48,11 @@ tar_option_set(
 tar_source()
 # tar_source("other_functions.R") # Source other scripts as needed.
 
+# Targets list ####
+
 # Replace the target list below with your own:
 list(
+  ## filenames ####
   tar_target(
     bcn_census_tract_file,
     "data/external/seccionado_2017/SECC_CE_20170101.shp",
@@ -93,6 +96,7 @@ list(
     "data/malert_private/bcn_bg_traps.Rds",
     format = "file"
   ),
+  ## loading data ####
   tar_target(bcn_bg_traps, get_bcn_bg_traps(bcn_bg_traps_file)),
   tar_target(landcover_data, get_urban_atlas_data(urban_atlas_file)),
   tar_target(
@@ -120,6 +124,7 @@ list(
       bcn_housing_age_file
     )
   ),
+  ## wrangling data ####
   tar_target(
     census_tracts_merged,
     merge_census_tract_data(bcn_census_tract_polygons, bcn_chars)
@@ -138,6 +143,7 @@ list(
       census_tracts_merged
     )
   ),
+  ## GPM Main ####
   tar_target(
     gpm_main,
     fit_gpm_main(bcn_census_tract_polygons, data_clean)
@@ -146,6 +152,7 @@ list(
     gpm_main_ces_plots, 
     plot_gpm_main_ces(gpm_main)
     ),
+  ## ASDM Main ####
   tar_target(
     asdm_data_clean,
     asdm_data_prep(
@@ -174,6 +181,7 @@ list(
     asdm_robust_ces_plots,
     plot_asdm_ces(asdm_robust, "drain_model_M_final_spaced200m")
   ),
+  ## MAVM Main ####
   tar_target(
     mavm_data_clean,
     prepare_mavm_data(
@@ -201,13 +209,28 @@ list(
     )
   ),
   tar_target(
+    mavm_prediction_figures, 
+    make_mavm_prediction_figures(
+      mavm_prediction_points, 
+      bcn_perimeter_polygon
+      )
+    ),
+  ## MTVM Main ####
+  tar_target(
     mtvm_main,
     fit_mtvm_main(bcn_bg_traps, bcn_chars, census_tracts_merged, ndvi)
+  ),
+  tar_target(
+    trap_map,
+    make_trap_map(
+      bcn_bg_traps, 
+      bcn_census_tract_polygons)
   ),
   tar_target(
     mtvm_plots,
     plot_mtvm_ces_plus_comparison(mtvm_main, mavm_main)
   ),
+  ## Model Comparisons ####
   tar_target(
     mtvm_comparisons, 
     fit_mtvm_comparisons(mtvm_main)
@@ -271,8 +294,15 @@ list(
   tar_target(
     gpm_comparison_table,
     make_gpm_comparison_table(gpm_comparisons, gpm_comparison_loos, gpm_comparison_br2s)
+  ),
+  ## Descriptive Figures ####
+  tar_target(
+    descriptive_figures, 
+    make_descriptive_figures(
+      data_clean, bcn_chars, 
+      bcn_perimeter_polygon, 
+      bcn_census_tract_polygons)
   )
-  
   
 )
 
