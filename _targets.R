@@ -255,7 +255,24 @@ list(
   tar_target(
     asdm_comparison_table,
     make_asdm_comparison_table(asdm_comparisons, asdm_comparison_loos, asdm_comparison_br2s)
+  ),
+  tar_target(
+    gpm_comparisons, 
+    fit_gpm_comparisons(gpm_main)
+  ),
+  tar_target(
+    gpm_comparison_loos,
+    make_gpm_comparison_loos(gpm_comparisons)
+  ),
+  tar_target(
+    gpm_comparison_br2s,
+    make_gpm_comparison_br2s(gpm_comparisons)
+  ),
+  tar_target(
+    gpm_comparison_table,
+    make_gpm_comparison_table(gpm_comparisons, gpm_comparison_loos, gpm_comparison_br2s)
   )
+  
   
 )
 
