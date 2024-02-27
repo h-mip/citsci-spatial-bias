@@ -13,8 +13,10 @@ type: software
 authors:
   - given-names: Álvaro
     family-names: Padilla-Pozo
-  - given-names: John
+    orcid: "https://orcid.org/0000-0002-2110-5309"
+  - given-names: John R.B.
     family-names: Palmer
+    orcid: "https://orcid.org/0000-0002-2648-7860"
 repository-code: >-
   https://github.com/h-mip/mosquito-citizen-science-neighborhood-sampling-bias-code
 abstract: >-
