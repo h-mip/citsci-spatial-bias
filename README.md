@@ -55,6 +55,13 @@ The code is written in R in an isolated, portable, reproducible environment crea
                         package versions. Do not modify this manually.
 ```
 
+## Targets Structure
+
+The structure of the targets pipeline is summarized in the following network plot:
+
+![](project_visNetwork.png)
+
+This can be viewed interactively [here](project_visNetwork.html).
 
 ## Data
 
