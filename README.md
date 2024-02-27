@@ -64,6 +64,10 @@ All of the [Mosquito Alert](https://www.mosquitoalert.com) data used by this cod
 
 The income and population data relied on here are available from the INE's [_Atlas de distribución de renta de los hogares_](https://ine.es/dyngs/INEbase/operacion.htm?c=Estadistica_C&cid=1254736177088&menu=resultados&idp=1254735976608). Census section geographic data is available from the [INE's Digital Cartography Files](https://ine.es/ss/Satellite?L=en_GB&c=Page&cid=1259952026632&p=1259952026632&pagename=ProductosYServicios%2FPYSLayout&rendermode=previewnoinsite%29). The weather data relied on in the Mosquito Trap Vector Model was taken from the [Meteorological Service of Catalonia's API](https://apidocs.meteocat.gencat.cat). 
 
+## Funding
+
+This research received funding from the ''la Caixa'' Foundation, under Grant HR19-00336, and from the European Research Council (ERC) under the European Union's Horizon 2020 research and innovation program (Grant agreement No. 853271). 
+
 ## License
 
 This code is licensed under the [GNU GENERAL PUBLIC LICENSE](https://github.com/h-mip/mosquito-citizen-science-neighborhood-sampling-bias-code/blob/main/LICENSE)
