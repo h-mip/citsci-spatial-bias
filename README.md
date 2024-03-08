@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/759879808.svg)](https://zenodo.org/doi/10.5281/zenodo.10796324)
+
 # Open Code for "Assessing and Correcting Neighborhood Socioeconomic Spatial Sampling Biases in Citizen Science Mosquito Data Collection"
 This repository contains the code used for the paper: "Assessing and Correcting Neighborhood Socioeconomic Spatial Sampling Biases in Citizen Science Mosquito Data Collection".
 
