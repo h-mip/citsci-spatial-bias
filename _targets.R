@@ -48,6 +48,10 @@ tar_option_set(
 tar_source()
 # tar_source("other_functions.R") # Source other scripts as needed.
 
+# Seed ####
+# setting seed to make it reproducible 
+tar_option_set(seed = 321)
+
 # Targets list ####
 
 # Replace the target list below with your own:
@@ -181,11 +185,12 @@ list(
     asdm_robust_ces_plots,
     plot_asdm_ces(asdm_robust, "drain_model_M_final_spaced200m")
   ),
+  tar_target(asdm_prediction_points, make_asdm_prediction_points(asdm_main, malert_sampling_effort, ndvi, landcover_data, bcn_perimeter_polygon, census_tracts_merged, bcn_chars)),
   ## MAVM Main ####
   tar_target(
     mavm_data_clean,
     prepare_mavm_data(
-      asdm_main,
+      asdm_main, asdm_prediction_points,
       malert_sampling_effort,
       ndvi,
       landcover_data,
@@ -200,7 +205,7 @@ list(
   tar_target(
     mavm_prediction_points,
     make_mavm_prediction_points(
-      mavm_main,
+      mavm_main, asdm_prediction_points,
       mavm_main_no_se,
       bcn_perimeter_polygon,
       ndvi,
@@ -306,3 +311,4 @@ list(
   
 )
 
+# visNetwork::visSave(tar_visnetwork(), file = "visnetwork.html")

@@ -162,20 +162,25 @@ bcn_socdem <- fromJSON(socio_dem_file, simplifyDataFrame = T) %>%
 filtered_df <- bcn_socdem %>%
   mutate(Data = purrr::map(Data, ~ filter(.x, Anyo == "2020"))) # Removing the "Anyo" column since all rows have the same value
 
+
 # Unnest the filtered data frames
 unnested_df <- filtered_df %>%
-  unnest(cols = Data) %>% 
-  mutate(census_section = str_extract(Nombre, "\\d{5}"),
-         var = str_match(Nombre, "\\d{5}\\.\\s(.*?)\\.\\sBase data\\.")[,2])
+  unnest(cols = Data) %>%
+  mutate(
+    census_section = str_extract(Nombre, "\\d{5}"),
+    var = str_match(Nombre, "\\d{5}\\.\\s(.*?)\\.\\sBase data\\.")[, 2]
+  )
 
-reshaped_socdem <- pivot_wider(unnested_df, 
-                               id_cols = census_section,
-                               names_from = var, 
-                               values_from = Valor)
+reshaped_socdem <- pivot_wider(
+  unnested_df,
+  id_cols = census_section,
+  names_from = var,
+  values_from = Valor
+)
 
 
 # Renta ####
-bcn_inc = fromJSON(income_file, simplifyDataFrame = T) %>% 
+bcn_inc = fromJSON(income_file, simplifyDataFrame = T) %>%
   filter(str_detect(Nombre, "Barcelona sección"))
 
 filtered_df <- bcn_inc %>%
@@ -183,14 +188,18 @@ filtered_df <- bcn_inc %>%
 
 # Unnest the filtered data frames
 unnested_df <- filtered_df %>%
-  unnest(cols = Data) %>% 
-  mutate(census_section = str_extract(Nombre, "\\d{5}"),
-         var = sub(".*\\. (.*)\\.", "\\1", Nombre))
+  unnest(cols = Data) %>%
+  mutate(
+    census_section = str_extract(Nombre, "\\d{5}"),
+    var = sub(".*\\. (.*)\\.", "\\1", Nombre)
+  )
 
-reshaped_inc <- pivot_wider(unnested_df, 
-                            id_cols = census_section,
-                            names_from = var, 
-                            values_from = Valor)
+reshaped_inc <- pivot_wider(
+  unnested_df,
+  id_cols = census_section,
+  names_from = var,
+  values_from = Valor
+)
 
 bcn_chars <- reshaped_socdem %>% 
   left_join(reshaped_inc, by = "census_section") %>% 
@@ -475,7 +484,9 @@ for(i in 1:nrow(these_variables)){
 
     filenames = c(filenames, this_filename)
     
-    }
+}
+  
+  return(filenames)
 }
 
 
@@ -499,56 +510,88 @@ fit_asdm_robust_check = function(asdm_data_clean){
   brm(any_reports ~  SE_expected + poly(mean_rent_consumption_unit,2) + log(popd) + p_singlehh + mean_age, data = drains_activity_yearly_buff200_spaced200m, family = bernoulli(link = "logit"), chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = n_threads, iter = 2000, silent = 0, control = list(adapt_delta = 0.97))
 
 }
- 
-# MAVM data prep ####
-prepare_mavm_data = function(asdm_main, malert_sampling_effort, ndvi, landcover_data, census_tracts_merged, bcn_chars, malert_reports_validated){
+
+# ASDM Prediction points ####
+make_asdm_prediction_points = function(asdm_main, malert_sampling_effort, ndvi, landcover_data, bcn_perimeter_polygon, census_tracts_merged, bcn_chars){
   
   n_cores = parallel::detectCores()
-  n_chains = 4
-  threads_per_chain = n_cores/n_chains
 
-# loading storm drain model
-storm_drain_model = asdm_main
+  # loading storm drain model
+  storm_drain_model = asdm_main
+  
+  # MALERT sampling effort
+  malert_se_full = malert_sampling_effort
+  
+  malert_se = malert_se_full %>% mutate(year = year(date)) %>% group_by(TigacellID, year) %>% summarise(SE_expected = sum(SE_expected))
+  
+  private_green = ndvi
+  
+  ua = landcover_data
+  
+  bcn_ssccs = census_tracts_merged
+  
+  sscc_private_green_areas = bcn_ssccs %>% st_intersection(private_green %>% st_transform(st_crs(bcn_ssccs))) %>% mutate(area = st_area(.)) %>% st_drop_geometry() %>% group_by(CUSEC) %>% summarise(private_green_area = sum(as.numeric(area)))
+  
+  bcn_ssccs = bcn_ssccs %>% left_join(sscc_private_green_areas) %>% replace_na(list(private_green_area = 0))
+  
+  # predicting drain model into bcn_ssccs here so that we can then sample proportionally to those predictions
+  
+  bcn_sscc_pred_points = st_make_grid(bcn_perimeter_polygon, cellsize = c(20,20), what = "centers", square = TRUE) %>% st_sf %>% st_join(bcn_ssccs, join = st_intersects, left=FALSE) 
+  
+  these_coords = st_coordinates(bcn_sscc_pred_points)
+  bcn_sscc_pred_points$lon = these_coords[,1]
+  bcn_sscc_pred_points$lat = these_coords[,2]
+  bcn_sscc_pred_points = bcn_sscc_pred_points %>% mutate(TigacellID = make_samplingcell_ids(lon = lon, lat = lat, mask = .025)) 
+  
+  bcn_sscc_pred_points_all = bind_rows(lapply(2014:2023, function(this_year){
+    bcn_sscc_pred_points %>% mutate(year = this_year)
+  }))
+  
+  bcn_sscc_pred_points_all = bcn_sscc_pred_points_all %>% left_join(malert_se) %>% replace_na(list(SE_expected = 0))
+  
+  bcn_sscc_pred_points_all$id_item = "new_drain"
+  
+  bcn_sscc_pred_points_all$preds = chunkified_posterior_predict(chunksize = 1000, cores = n_cores, model=storm_drain_model, newdata = bcn_sscc_pred_points_all, draws = 1000, allow_new_levels = TRUE)
+  
+  nearest_private_green_indexes = bcn_sscc_pred_points_all %>% st_nearest_feature(private_green %>% st_transform(st_crs(bcn_ssccs)))
+  
+  dist_nearest_private_green = bcn_sscc_pred_points_all %>% st_distance(private_green[nearest_private_green_indexes,]%>% st_transform(st_crs(bcn_ssccs)), by_element = TRUE)
+  
+  
+  bcn_sscc_pred_points_all$x = st_coordinates(bcn_sscc_pred_points_all)[, "X"]
+  
+  bcn_sscc_pred_points_all$y = st_coordinates(bcn_sscc_pred_points_all)[, "Y"]
+  
+  bcn_sscc_pred_points_all = bcn_sscc_pred_points_all %>% mutate(dist_nearest_private_green = as.numeric(dist_nearest_private_green), dist_nearest_private_green_neg_exp = -exp(dist_nearest_private_green), ddf_proximity = ddf(dist_nearest_private_green)) 
+  
+  return(bcn_sscc_pred_points_all)
+}
+ 
+# MAVM data prep ####
+prepare_mavm_data = function(asdm_main, asdm_prediction_points, malert_sampling_effort, ndvi, landcover_data, census_tracts_merged, bcn_chars, malert_reports_validated){
+  
+  n_cores = parallel::detectCores()
 
-# MALERT sampling effort
-malert_se_full = malert_sampling_effort
-
-malert_se = malert_se_full %>% mutate(year = year(date)) %>% group_by(TigacellID, year) %>% summarise(SE_expected = sum(SE_expected))
-
-private_green = ndvi
-
+  # loading storm drain model
+  storm_drain_model = asdm_main
+  
+  private_green = ndvi
+  
+  # MALERT sampling effort
+  malert_se_full = malert_sampling_effort
+  
+  malert_se = malert_se_full %>% mutate(year = year(date)) %>% group_by(TigacellID, year) %>% summarise(SE_expected = sum(SE_expected))
+  
 ua = landcover_data
 
 bcn_ssccs = census_tracts_merged
 
-sscc_private_green_areas = bcn_ssccs %>% st_intersection(private_green %>% st_transform(st_crs(bcn_ssccs))) %>% mutate(area = st_area(.)) %>% st_drop_geometry() %>% group_by(CUSEC) %>% summarise(private_green_area = sum(as.numeric(area)))
-
-bcn_ssccs = bcn_ssccs %>% left_join(sscc_private_green_areas) %>% replace_na(list(private_green_area = 0))
-
-# predicting drain model into bcn_ssccs here so that we can then sample proportionally to those predictions
-
-bcn_sscc_pred_points = st_sample(bcn_ssccs, size = 500000, type = "random") %>% st_as_sf() %>% st_join(bcn_ssccs) %>% st_transform(4326) 
-these_coords = st_coordinates(bcn_sscc_pred_points)
-bcn_sscc_pred_points$lon = these_coords[,1]
-bcn_sscc_pred_points$lat = these_coords[,2]
-bcn_sscc_pred_points = bcn_sscc_pred_points %>% mutate(TigacellID = make_samplingcell_ids(lon = lon, lat = lat, mask = .025)) 
-
-bcn_sscc_pred_points_all = bind_rows(lapply(2014:2023, function(this_year){
-  bcn_sscc_pred_points %>% mutate(year = this_year)
-}))
-
-bcn_sscc_pred_points_all = bcn_sscc_pred_points_all %>% left_join(malert_se) %>% replace_na(list(SE_expected = 0))
-
-bcn_sscc_pred_points_all$id_item = "new_drain"
-
-bcn_sscc_pred_points_all$preds = chunkified_posterior_predict(chunksize = 1000, cores = n_cores, model=storm_drain_model, newdata = bcn_sscc_pred_points_all, draws = 1000, allow_new_levels = TRUE)
-
 n_absences = 20000
 
-pseudo_absences = sample_n(bcn_sscc_pred_points_all, size = n_absences, weight = bcn_sscc_pred_points_all$pred, replace = FALSE) %>% dplyr::select(year)
+pseudo_absences = sample_n(asdm_prediction_points, size = n_absences, weight = asdm_prediction_points$preds, replace = FALSE) %>% dplyr::select(year)
 
 # now doing a version witout accounting for sampling effort, same size as the other but simple random sample across the city
-pseudo_absences_no_se = sample_n(bcn_sscc_pred_points_all, size = n_absences, replace = FALSE) %>% dplyr::select(year)
+pseudo_absences_no_se = sample_n(asdm_prediction_points, size = n_absences, replace = FALSE) %>% dplyr::select(year)
 
 # ggplot(pseudo_absences) + geom_sf(alpha = .5, size=.5)
 # ggplot(pseudo_absences_no_se) + geom_sf(alpha = .5, size=.5)
@@ -570,7 +613,7 @@ if(nmissing>0){
     st_sample(missing_ssccs[i,], size = 1) %>% st_sf()
   })) %>% mutate(presence = FALSE)
   
-  vrs_absence = bind_rows(vrs_absence, vrs_absence_one_per_sscc %>% st_transform(4326))
+  vrs_absence = bind_rows(vrs_absence, vrs_absence_one_per_sscc)
 }
 
 # again with the no_se version
@@ -584,7 +627,7 @@ if(nmissing>0){
     st_sample(missing_ssccs[i,], size = 1) %>% st_sf()
   })) %>% mutate(presence = FALSE)
   
-  vrs_absence_no_se = bind_rows(vrs_absence_no_se, vrs_absence_one_per_sscc %>% st_transform(4326))
+  vrs_absence_no_se = bind_rows(vrs_absence_no_se, vrs_absence_one_per_sscc)
 }
 vrs_absence_lon_lat = vrs_absence %>% st_coordinates() %>% as_tibble() %>% rename(lon = X, lat = Y)
 
@@ -710,7 +753,7 @@ fit_mavm_main_no_se = function(mavm_data_clean){
 
 # MAVM Main Predictions High Res ####
 
-make_mavm_prediction_points = function(mavm_main, mavm_main_no_se, bcn_perimeter_polygon, ndvi, census_tracts_merged, landcover_data){
+make_mavm_prediction_points = function(mavm_main, asdm_prediction_points, mavm_main_no_se, bcn_perimeter_polygon, ndvi, census_tracts_merged, landcover_data){
     
   n_cores = parallel::detectCores()
 
@@ -724,24 +767,8 @@ make_mavm_prediction_points = function(mavm_main, mavm_main_no_se, bcn_perimeter
   bcn_perimeter = bcn_perimeter_polygon
   # bcn_perimeter %>% ggplot() + geom_sf()
   
-  these_points = st_make_grid(bcn_perimeter, cellsize = c(20,20), what = "centers", square = TRUE) %>% st_sf %>% st_join(bcn_ssccs, join = st_intersects, left=FALSE) %>% st_join(ua %>% st_transform(st_crs(bcn_ssccs)))
+  these_points = asdm_prediction_points %>% filter(year == 2022) %>% st_transform(st_crs(bcn_ssccs)) %>% st_join(ua %>% st_transform(st_crs(bcn_ssccs)))
   
-  # bcn_perimeter %>% ggplot + geom_sf() + geom_sf(data = these_points) 
-  
-  nearest_private_green_indexes = these_points %>% st_nearest_feature(private_green %>% st_transform(st_crs(bcn_ssccs)))
-  
-  dist_nearest_private_green = these_points %>% st_distance(private_green[nearest_private_green_indexes,]%>% st_transform(st_crs(bcn_ssccs)), by_element = TRUE)
-  
-  
-  these_points$x = st_coordinates(these_points)[, "X"]
-  
-  these_points$y = st_coordinates(these_points)[, "Y"]
-  
-  these_points = these_points %>% mutate(dist_nearest_private_green = as.numeric(dist_nearest_private_green), dist_nearest_private_green_neg_exp = -exp(dist_nearest_private_green), ddf_proximity = ddf(dist_nearest_private_green)) %>% st_drop_geometry()
-  
-  # these_points = these_points %>% filter(CUSEC %in% unique(D$CUSEC))
-  
-  # setting sampling effort to a constant
   
   these_points$pred = median(D$pred)
   
@@ -777,16 +804,16 @@ make_mavm_prediction_figures = function(prediction_points, bcn_perimeter){
   
   r1_diffs = raster::rasterFromXYZ(these_points %>% st_drop_geometry() %>% select(x, y, pred_diff), crs=st_crs(these_points)) 
   
-  #  range(these_points$pred_diff)
+    range(these_points$pred_diff)
   
   # hist(these_points$pred_diff)
   # breaks = c(-.3, -.2, -.1, .1, .2, .3)
   
-  breaks = c(-.4, -.3, -.2, -.1, -.05, .05, .1, .2)
+  breaks = c(-.5, -.2,-.1, -.05, .05, .1, .2, .5)
   
   cols = colorRampPalette(RColorBrewer::brewer.pal(length(breaks), "Spectral")[length(breaks):1])(length(breaks)-1)
   
-  cols[5] = "lightgrey"
+  cols[4] = "lightgrey"
   
   these_points$pred_diff_cuts = cut(these_points$pred_diff, breaks = breaks)
   
@@ -813,6 +840,8 @@ make_mavm_prediction_figures = function(prediction_points, bcn_perimeter){
   
   this_filename = "figures/districts_npoints_pred_diff_lt_neg.3.tex"
   these_filenames = c(these_filenames, this_filename)
+  
+  these_points = these_points %>% st_drop_geometry()
   
   these_points %>% filter(pred_diff < -.3) %>% group_by(Nom_Districte) %>% summarise(n = n()) %>% xtable::xtable(type = "latex") %>% print(file = this_filename)
   
