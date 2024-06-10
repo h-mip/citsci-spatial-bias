@@ -332,6 +332,22 @@ incomes$CUSEC = unlist(lapply(incomes$Name, function(x) strsplit(x, " ")[[1]][1]
    return(result)
 }
 
+# Multicolinearity check ####
+
+check_colinearity_gpm = function(data_clean){
+  inc <- lm(mean_rent_consumption_unit~p_singlehh+popd+mean_age, data = data_clean)
+  singlehh <- lm(p_singlehh~mean_rent_consumption_unit+popd+mean_age, data = data_clean)
+  age <- lm(mean_age~mean_rent_consumption_unit+popd+p_singlehh, data = data_clean)
+  return(c("inc" = summary(inc)$r.squared, "singlehh" = summary(singlehh)$r.squared, "age" = summary(age)$r.squared)) 
+}
+
+check_colinearity_asdm = function(asdm_data_clean){
+  inc <- lm(mean_rent_consumption_unit~p_singlehh+popd+SE_expected+mean_age, data = asdm_data_clean$drains_activity_yearly_buff200)
+  singlehh <- lm(p_singlehh~mean_rent_consumption_unit+popd+SE_expected+mean_age, data = asdm_data_clean$drains_activity_yearly_buff200)
+  se <- lm(SE_expected~mean_rent_consumption_unit+popd+p_singlehh+mean_age, data = asdm_data_clean$drains_activity_yearly_buff200)
+  age <- lm(mean_age~mean_rent_consumption_unit+popd+p_singlehh+SE_expected, data = asdm_data_clean$drains_activity_yearly_buff200)
+  return( c("inc" = summary(inc)$r.squared, "singlehh" = summary(singlehh)$r.squared, "age" = summary(age)$r.squared, "se" = summary(se)$r.squared) )
+}
 
 # Main General Participation Model ####
 fit_gpm_main = function(bcn_census_tract_polygons, data_clean){
@@ -1087,7 +1103,7 @@ make_mtvm_comparison_table = function(mtvm_comparisons, mtvm_comparison_loos, mt
   
   this_filename = "figures/mosquito_trap_vector_model_table.tex"
   
-  mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex', gof = this_gof, gofnames = these_gof_names, custom.gof.rows = cust_rows, coefnames = these_coef_names, pointest="median", ci=.90, single.row=TRUE, sd=TRUE, custom.model.names = model_names, digits = 2, dcolumn = TRUE, use.packages = FALSE, center = FALSE, label = "mtvm", caption = "Parameter estimates for Mosquito Trap Vector Models.", file = this_filename)
+  mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex', gof = this_gof, gofnames = these_gof_names, custom.gof.rows = cust_rows, coefnames = these_coef_names, pointest="median", ci=.90, single.row=FALSE, sd=FALSE, custom.model.names = model_names, digits = 2, dcolumn = TRUE, use.packages = FALSE, center = FALSE, label = "mtvm", caption = "Parameter estimates for Mosquito Trap Vector Models.", file = this_filename)
   
 return(this_filename)
   
@@ -1172,7 +1188,7 @@ make_mavm_comparison_table = function(mavm_comparisons, mavm_comparison_loos, ma
   
   this_filename = "figures/mosquito_alert_vector_model_table.tex"
   
-  mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex', gof = this_gof, gofnames = these_gof_names, custom.gof.rows = list("Spatial Autocorr." = c("icar", "icar", "none", "icar"), Observations = rep(N, length(models))), coefnames = these_coef_names, pointest="median", ci=.90, single.row=TRUE, sd=TRUE, custom.model.names = model_names, digits = 2, dcolumn = TRUE, use.packages = FALSE, center = FALSE, label = "tab:mavm", caption = "Parameter estimates for Mosquito Alert Vector Models.", file = this_filename)
+  mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex', gof = this_gof, gofnames = these_gof_names, custom.gof.rows = list("Spatial Autocorr." = c("icar", "icar", "none", "icar"), Observations = rep(N, length(models))), coefnames = these_coef_names, pointest="median", ci=.90, single.row=FALSE, sd=FALSE, custom.model.names = model_names, digits = 2, dcolumn = TRUE, use.packages = FALSE, center = FALSE, label = "tab:mavm", caption = "Parameter estimates for Mosquito Alert Vector Models.", file = this_filename)
   
   return(this_filename)
 }
@@ -1261,7 +1277,7 @@ cust_rows = list("Random Intercepts" = c("drain", "drain", "drain", "drain", "no
 
 this_filename = "figures/drain_model_table.tex"
 
-mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex', gof = this_gof, gofnames = these_gof_names, custom.gof.rows = cust_rows, coefnames = these_coef_names, pointest="median", ci=.90, single.row=TRUE, sd=TRUE, custom.model.names = model_names, digits = 2, dcolumn = TRUE, use.packages = FALSE, center = FALSE, sideways = TRUE, label = "asdpm", caption = "Parameter estimates for Active Sewer Drain Participation Models.", file = this_filename)
+mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex', gof = this_gof, gofnames = these_gof_names, custom.gof.rows = cust_rows, coefnames = these_coef_names, pointest="median", ci=.90, single.row=FALSE, sd=FALSE, custom.model.names = model_names, digits = 2, dcolumn = TRUE, use.packages = FALSE, center = FALSE, sideways = TRUE, label = "asdpm", caption = "Parameter estimates for Active Sewer Drain Participation Models.", file = this_filename)
 
 return(this_filename)
 
@@ -1351,7 +1367,7 @@ make_gpm_comparison_table = function(gpm_comparisons, gpm_comparison_loos, gpm_c
   
   this_filename = "figures/general_participation_model_table.tex"
   
-  mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex', gof = this_gof, gofnames = these_gof_names, custom.gof.rows = cust_rows, coefnames = these_coef_names, pointest="median", ci=.90, single.row=TRUE, sd=TRUE, custom.model.names = model_names, digits = 2, dcolumn = TRUE, use.packages = FALSE, center = FALSE, label = "gpm", caption = "Parameter estimates for General Participation Models.", file = this_filename)
+  mcmcReg(models, pars = "b_", regex = TRUE, format = 'latex', gof = this_gof, gofnames = these_gof_names, custom.gof.rows = cust_rows, coefnames = these_coef_names, pointest="median", ci=.90, single.row=FALSE, sd=FALSE, custom.model.names = model_names, digits = 2, dcolumn = TRUE, use.packages = FALSE, center = FALSE, sideways = TRUE, label = "gpm", caption = "Parameter estimates for General Participation Models.", file = this_filename)
   
   return(this_filename)
   
