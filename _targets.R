@@ -309,12 +309,12 @@ list(
       bcn_census_tract_polygons)
   ),
   tar_target(
-    colinearity_gpm,
-    check_colinearity_gpm(data_clean)
+    collinearity_gpm,
+    check_collinearity_gpm(data_clean)
   ),
   tar_target(
-    colinearity_asdm,
-    check_colinearity_asdm(asdm_data_clean)
+    collinearity_asdm,
+    check_collinearity_asdm(asdm_data_clean)
   )
   
 )

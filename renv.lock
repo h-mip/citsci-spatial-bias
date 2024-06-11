@@ -280,7 +280,7 @@
     },
     "RcppEigen": {
       "Package": "RcppEigen",
-      "Version": "0.3.3.9.4",
+      "Version": "0.3.4.0.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -289,7 +289,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "acb0a5bf38490f26ab8661b467f4f53a"
+      "Hash": "df49e3306f232ec28f1604e36a202847"
     },
     "RcppParallel": {
       "Package": "RcppParallel",
@@ -317,7 +317,7 @@
     },
     "StanHeaders": {
       "Package": "StanHeaders",
-      "Version": "2.32.5",
+      "Version": "2.32.9",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -325,7 +325,7 @@
         "RcppEigen",
         "RcppParallel"
       ],
-      "Hash": "b8d6850ef3e330bc108e712679e79443"
+      "Hash": "affbfba7203fd83b6594362f1355c25b"
     },
     "XML": {
       "Package": "XML",
@@ -1517,7 +1517,7 @@
     },
     "httpuv": {
       "Package": "httpuv",
-      "Version": "1.6.14",
+      "Version": "1.6.15",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1528,7 +1528,7 @@
         "promises",
         "utils"
       ],
-      "Hash": "16abeb167dbf511f8cc0552efaf05bab"
+      "Hash": "d55aa087c47a63ead0f6fc10f8fa1ee0"
     },
     "httr": {
       "Package": "httr",
@@ -1893,7 +1893,7 @@
     },
     "loo": {
       "Package": "loo",
-      "Version": "2.6.0",
+      "Version": "2.7.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1901,9 +1901,10 @@
         "checkmate",
         "matrixStats",
         "parallel",
+        "posterior",
         "stats"
       ],
-      "Hash": "e5c8f41731502a0e98f353da23f7ca30"
+      "Hash": "7917e9c58d89dbb80d8eede166581fa0"
     },
     "lubridate": {
       "Package": "lubridate",
@@ -2185,7 +2186,7 @@
     },
     "pkgbuild": {
       "Package": "pkgbuild",
-      "Version": "1.4.3",
+      "Version": "1.4.4",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -2196,7 +2197,7 @@
         "desc",
         "processx"
       ],
-      "Hash": "c0143443203205e6a2760ce553dafc24"
+      "Hash": "a29e8e134a460a01e0ca67a4763c595b"
     },
     "pkgconfig": {
       "Package": "pkgconfig",
@@ -2598,7 +2599,7 @@
     },
     "rstan": {
       "Package": "rstan",
-      "Version": "2.32.5",
+      "Version": "2.32.6",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -2617,7 +2618,7 @@
         "pkgbuild",
         "stats4"
       ],
-      "Hash": "378a10b6373822761ec78021c105b059"
+      "Hash": "8a5b5978f888a3477c116e0395d006f8"
     },
     "rstanarm": {
       "Package": "rstanarm",

@@ -20,7 +20,7 @@ library(mosquitoR)
 library(parallel)
 library(latticeExtra)
 library(BayesPostEst)
-
+library(pkgbuild)
 
 # helper functions ####
 
@@ -332,22 +332,24 @@ incomes$CUSEC = unlist(lapply(incomes$Name, function(x) strsplit(x, " ")[[1]][1]
    return(result)
 }
 
-# Multicolinearity check ####
+# Multicollinearity and correlation checks ####
 
-check_colinearity_gpm = function(data_clean){
+check_collinearity_gpm = function(data_clean){
   inc <- lm(mean_rent_consumption_unit~p_singlehh+popd+mean_age, data = data_clean)
   singlehh <- lm(p_singlehh~mean_rent_consumption_unit+popd+mean_age, data = data_clean)
   age <- lm(mean_age~mean_rent_consumption_unit+popd+p_singlehh, data = data_clean)
-  return(c("inc" = summary(inc)$r.squared, "singlehh" = summary(singlehh)$r.squared, "age" = summary(age)$r.squared)) 
+  Rsqs = c("inc" = summary(inc)$r.squared, "singlehh" = summary(singlehh)$r.squared, "age" = summary(age)$r.squared)
+  return(Rsqs) 
 }
 
-check_colinearity_asdm = function(asdm_data_clean){
+check_collinearity_asdm = function(asdm_data_clean){
   inc <- lm(mean_rent_consumption_unit~p_singlehh+popd+SE_expected+mean_age, data = asdm_data_clean$drains_activity_yearly_buff200)
   singlehh <- lm(p_singlehh~mean_rent_consumption_unit+popd+SE_expected+mean_age, data = asdm_data_clean$drains_activity_yearly_buff200)
   se <- lm(SE_expected~mean_rent_consumption_unit+popd+p_singlehh+mean_age, data = asdm_data_clean$drains_activity_yearly_buff200)
   age <- lm(mean_age~mean_rent_consumption_unit+popd+p_singlehh+SE_expected, data = asdm_data_clean$drains_activity_yearly_buff200)
   return( c("inc" = summary(inc)$r.squared, "singlehh" = summary(singlehh)$r.squared, "age" = summary(age)$r.squared, "se" = summary(se)$r.squared) )
 }
+
 
 # Main General Participation Model ####
 fit_gpm_main = function(bcn_census_tract_polygons, data_clean){
@@ -1048,6 +1050,7 @@ fit_mtvm_comparisons = function(mtvm_main){
   
 return(models)
 }
+
 
 # MTVM comparison loos ####
 make_mtvm_comparison_loos = function(mtvm_comparisons){
