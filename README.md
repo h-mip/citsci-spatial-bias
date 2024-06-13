@@ -54,7 +54,10 @@ The code is written in R in an isolated, portable, reproducible environment crea
 ├── README.md        <- This file.
 |
 ├── renv.lock        <- File used by the renv library for keeping track of
-                        package versions. Do not modify this manually.
+|                        package versions. Do not modify this manually.
+|
+├── Dockerfile       <- File for building docker image.
+
 ```
 
 ## Data
