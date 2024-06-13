@@ -2,7 +2,7 @@
 FROM rocker/r-ver:4
 
 # Install some linux libraries that R packages need
-RUN apt-get update && apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev jags pkg-config cmake default-jre default-jdk libz-dev libglpk-dev libpng-dev gdal-bin libgdal-dev libudunits2-dev
+RUN apt-get update && apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev jags pkg-config cmake default-jre default-jdk libz-dev libglpk-dev libpng-dev gdal-bin libgdal-dev libudunits2-dev libfontconfig1-dev
 
 # renv version
 ENV RENV_VERSION 1.0.7
