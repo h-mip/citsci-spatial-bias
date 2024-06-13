@@ -33,7 +33,7 @@ jobs:
           fetch-depth: 0  # OR "2" -> To retrieve the preceding commit.
 
       - name: Run file diff checking image
-        uses: tj-actions/changed-files@v14.1
+        uses: tj-actions/changed-files@v41
 
       - name: Build image
         if: contains(steps.changed-files.outputs.modified_files, 'renv.lock')
