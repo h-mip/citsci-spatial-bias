@@ -1041,10 +1041,13 @@ fit_mtvm_comparisons = function(mtvm_main){
   M3 = brm(bf(females ~ poly(meanTM30,2) + poly(mean_rent_consumption_unit,2), zi ~ poly(meanTM30,2) ), data=D, family = zero_inflated_poisson(), prior = set_prior("normal(0,2)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
   
   M2 = brm(bf(females ~ poly(meanTM30,2) + (1 | trap_name), zi ~ poly(meanTM30,2) ), data=D, family = zero_inflated_poisson(), prior = set_prior("normal(0,2)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
+
+  M5 = brm(females ~ poly(mean_rent_consumption_unit,2) + (1 | trap_name), data=D, family = zero_inflated_poisson(), prior = set_prior("normal(0,2)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
   
+    
   M1 = brm(females ~ poly(meanTM30,2) + poly(mean_rent_consumption_unit,2) + (1 | trap_name), data=D, family = poisson(), prior = set_prior("normal(0,2)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
   
-  models = list("MTVM1" = M1, "MTVM2" = M2, "MTVM3" = M3, "MTVM4" = M4)
+  models = list("MTVM1" = M1, "MTVM2" = M2, "MTVM3" = M3, "MTVM4" = M4, "MTVM5" = M5)
   
 return(models)
 }
@@ -1055,7 +1058,8 @@ make_mtvm_comparison_loos = function(mtvm_comparisons){
   n_cores = min(length(mtvm_comparisons), parallel::detectCores())
   
   loos = mclapply(mtvm_comparisons, function(M){
-    loo(M, moment_match = TRUE)
+    this_loo = loo(M)
+    return(this_loo)
   }, mc.cores = n_cores)
  
   names(loos) = names(mtvm_comparisons)
@@ -1097,9 +1101,9 @@ make_mtvm_comparison_table = function(mtvm_comparisons, mtvm_comparison_loos, mt
   
   these_gof_names = lapply(1:length(models), function(x){ return(c("Bayes R-sq.", "SE Bayes R-sq.", "ELPD", "SE ELPD"))})
   
-  these_coef_names = list(c("Int.",  "TMP", "TMP sq.", "INC", "INC sq." ),  c("Int.",  "TMP", "TMP sq.", "ZI Int.", "ZI TMP", "ZI TMP sq."), c("Int.",  "TMP", "TMP sq.", "INC", "INC sq.", "ZI Int.", "ZI TMP", "ZI TMP sq."),  c("Int.",  "TMP", "TMP sq.", "INC", "INC sq.", "ZI Int.", "ZI TMP", "ZI TMP sq."))
+  these_coef_names = list(c("Int.",  "TMP", "TMP sq.", "INC", "INC sq." ),  c("Int.",  "TMP", "TMP sq.", "ZI Int.", "ZI TMP", "ZI TMP sq."), c("Int.",  "TMP", "TMP sq.", "INC", "INC sq.", "ZI Int.", "ZI TMP", "ZI TMP sq."),  c("Int.",  "TMP", "TMP sq.", "INC", "INC sq.", "ZI Int.", "ZI TMP", "ZI TMP sq."),  c("Int.", "INC", "INC sq."))
   
-  cust_rows = list("Random Intercepts" = c("trap", "trap", "none", "trap"), "Distribution" = c("Poisson", "ZI Poisson", "ZI Poisson", "ZI Poisson"), Observations = rep(N, length(models)))
+  cust_rows = list("Random Intercepts" = c("trap", "trap", "none", "trap", "trap"), "Distribution" = c("Poisson", "ZI Poisson", "ZI Poisson", "ZI Poisson", "ZI Poisson"), Observations = rep(N, length(models)))
   
   this_filename = "figures/mosquito_trap_vector_model_table.tex"
   
