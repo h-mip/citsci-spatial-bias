@@ -21,7 +21,7 @@ COPY renv.lock renv.lock
 RUN Rscript -e 'renv::restore()'
 
 # install cmdstan v 2.32.2 (version is key for making sure brms models work)
-RUN Rscript -e 'cmdstanr::install_cmdstan(version = "2.32.2”)'
+RUN Rscript -e "cmdstanr::install_cmdstan(version = '2.32.2')"
 
 # Default to bash terminal when running docker image
 CMD ["bash"]
