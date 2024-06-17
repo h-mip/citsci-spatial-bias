@@ -396,7 +396,7 @@ return(filenames)
 
 asdm_data_prep = function(bcn_chars, census_tracts_merged, malert_sampling_effort, drain_data, data_clean){
 
-n_cores = parallel::detectCores()
+# n_cores = parallel::detectCores()
 
 bcn_ssccs = census_tracts_merged
 
@@ -408,7 +408,7 @@ drains_table_yearly = drain_data %>% dplyr::select(year =yyear, id_item = codi_s
 
 drain_locations_wkb_character = drains_table_yearly %>% dplyr::select(id_item, geom) %>% distinct()
 
-drain_locations = bind_rows(mclapply(1:nrow(drain_locations_wkb_character), function(i) st_sf(id_item = drain_locations_wkb_character$id_item[i], geometry = st_as_sfc(structure(list(drain_locations_wkb_character$geom[i]), class = "WKB"), EWKB = TRUE)), mc.cores = n_cores))
+drain_locations = bind_rows(lapply(1:nrow(drain_locations_wkb_character), function(i) st_sf(id_item = drain_locations_wkb_character$id_item[i], geometry = st_as_sfc(structure(list(drain_locations_wkb_character$geom[i]), class = "WKB"), EWKB = TRUE))))
 
 drains_lon_lat = as_tibble(st_coordinates(drain_locations %>% st_transform(4326))) %>% rename(lon = X, lat = Y)
 
