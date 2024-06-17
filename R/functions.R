@@ -924,7 +924,7 @@ fit_mtvm_main = function(bcn_bg_traps, bcn_chars, census_tracts_merged, ndvi){
   
   bg = bg %>% mutate(dist_nearest_private_green = as.numeric(dist_nearest_private_green), dist_nearest_private_green_neg_exp = -exp(dist_nearest_private_green), ddf_proximity = ddf(dist_nearest_private_green))
   
-  brm(bf(females ~ poly(meanTM30,2) + poly(mean_rent_consumption_unit,2) + (1 | trap_name), zi ~ poly(meanTM30,2) ), data=bg, family = zero_inflated_poisson(), prior = set_prior("normal(0,2)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
+  brm(bf(females ~ poly(meanTM30,2) + poly(mean_rent_consumption_unit,2) + (1 | trap_name), zi ~ poly(meanTM30,2) ), data=bg, family = zero_inflated_poisson(), prior = set_prior("normal(0,1)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
   
 }
 
@@ -1038,14 +1038,14 @@ fit_mtvm_comparisons = function(mtvm_main){
   
   D = M4$data
   
-  M3 = brm(bf(females ~ poly(meanTM30,2) + poly(mean_rent_consumption_unit,2), zi ~ poly(meanTM30,2) ), data=D, family = zero_inflated_poisson(), prior = set_prior("normal(0,2)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
+  M3 = brm(bf(females ~ poly(meanTM30,2) + poly(mean_rent_consumption_unit,2), zi ~ poly(meanTM30,2) ), data=D, family = zero_inflated_poisson(), prior = set_prior("normal(0,1)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
   
-  M2 = brm(bf(females ~ poly(meanTM30,2) + (1 | trap_name), zi ~ poly(meanTM30,2) ), data=D, family = zero_inflated_poisson(), prior = set_prior("normal(0,2)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
+  M2 = brm(bf(females ~ poly(meanTM30,2) + (1 | trap_name), zi ~ poly(meanTM30,2) ), data=D, family = zero_inflated_poisson(), prior = set_prior("normal(0,1)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
 
-  M5 = brm(females ~ poly(mean_rent_consumption_unit,2) + (1 | trap_name), data=D, family = zero_inflated_poisson(), prior = set_prior("normal(0,2)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
+  M5 = brm(females ~ poly(mean_rent_consumption_unit,2) + (1 | trap_name), data=D, family = zero_inflated_poisson(), prior = set_prior("normal(0,1)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
   
     
-  M1 = brm(females ~ poly(meanTM30,2) + poly(mean_rent_consumption_unit,2) + (1 | trap_name), data=D, family = poisson(), prior = set_prior("normal(0,2)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
+  M1 = brm(females ~ poly(meanTM30,2) + poly(mean_rent_consumption_unit,2) + (1 | trap_name), data=D, family = poisson(), prior = set_prior("normal(0,1)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
   
   models = list("MTVM1" = M1, "MTVM2" = M2, "MTVM3" = M3, "MTVM4" = M4, "MTVM5" = M5)
   
@@ -1057,10 +1057,10 @@ make_mtvm_comparison_loos = function(mtvm_comparisons){
   
   n_cores = min(length(mtvm_comparisons), parallel::detectCores())
   
-  loos = mclapply(mtvm_comparisons, function(M){
-    this_loo = loo(M)
+  loos = lapply(mtvm_comparisons, function(M){
+    this_loo = loo(M, moment_match=TRUE, reloo = TRUE)
     return(this_loo)
-  }, mc.cores = n_cores)
+  })
  
   names(loos) = names(mtvm_comparisons)
   
