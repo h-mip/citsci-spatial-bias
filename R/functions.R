@@ -75,10 +75,21 @@ message_parallel <- function(...){
 chunkified_posterior_predict = function(chunksize = 1000, cores = 1, model, newdata, draws = 1000, allow_new_levels = TRUE){
   chunks = seq(1, nrow(newdata), chunksize)
   n_chunks = length(chunks)
+  
+  if(cores > 1){
+  
   return(unlist(mclapply(chunks, function(i){
     message_parallel(paste0(i, " of ", nrow(newdata)))
     apply(posterior_predict(model, newdata = newdata[i:min(nrow(newdata), (i+(chunksize-1))), ], draws = draws, allow_new_levels = allow_new_levels), 2, function(x) mean(x))
   }, mc.cores = cores)))
+  } else{
+    
+    return(unlist(lapply(chunks, function(i){
+      print(paste0(i, " of ", nrow(newdata)))
+      apply(posterior_predict(model, newdata = newdata[i:min(nrow(newdata), (i+(chunksize-1))), ], draws = draws, allow_new_levels = allow_new_levels), 2, function(x) mean(x))
+    })))
+  }
+    
 }
 
 
@@ -530,7 +541,7 @@ fit_asdm_robust_check = function(asdm_data_clean){
 # ASDM Prediction points ####
 make_asdm_prediction_points = function(asdm_main, malert_sampling_effort, ndvi, landcover_data, bcn_perimeter_polygon, census_tracts_merged, bcn_chars){
   
-  n_cores = parallel::detectCores()
+  n_cores = 1
 
   # loading storm drain model
   storm_drain_model = asdm_main
@@ -567,7 +578,9 @@ make_asdm_prediction_points = function(asdm_main, malert_sampling_effort, ndvi, 
   
   bcn_sscc_pred_points_all$id_item = "new_drain"
   
-  bcn_sscc_pred_points_all$preds = chunkified_posterior_predict(chunksize = 1000, cores = n_cores, model=storm_drain_model, newdata = bcn_sscc_pred_points_all, draws = 1000, allow_new_levels = TRUE)
+  this_chunksize = 1000
+  
+  bcn_sscc_pred_points_all$preds = chunkified_posterior_predict(chunksize = this_chunksize, cores = n_cores, model=storm_drain_model, newdata = bcn_sscc_pred_points_all, draws = 1000, allow_new_levels = TRUE)
   
   nearest_private_green_indexes = bcn_sscc_pred_points_all %>% st_nearest_feature(private_green %>% st_transform(st_crs(bcn_ssccs)))
   
@@ -771,7 +784,7 @@ fit_mavm_main_no_se = function(mavm_data_clean){
 
 make_mavm_prediction_points = function(mavm_main, asdm_prediction_points, mavm_main_no_se, bcn_perimeter_polygon, ndvi, census_tracts_merged, landcover_data){
     
-  n_cores = parallel::detectCores()
+  n_cores = 1
 
   bcn_ssccs = census_tracts_merged
   
@@ -791,12 +804,11 @@ make_mavm_prediction_points = function(mavm_main, asdm_prediction_points, mavm_m
   these_points$id_item = "new_drain"
   
   
-  chunksize = 1000
-  
-  these_points$preds = chunkified_posterior_predict(chunksize = 1000, cores = n_cores, model = mavm_main, newdata = these_points, draws = 1000, allow_new_levels = TRUE)
-  
-  
-  these_points$preds_no_se = chunkified_posterior_predict(chunksize = 1000, cores = n_cores, model = mavm_main_no_se, newdata = these_points, draws = 1000, allow_new_levels = TRUE)
+  this_chunksize = 1000
+
+  these_points$preds = chunkified_posterior_predict(chunksize = this_chunksize, cores = n_cores, model = mavm_main, newdata = these_points, draws = 1000, allow_new_levels = TRUE)
+
+  these_points$preds_no_se = chunkified_posterior_predict(chunksize = this_chunksize, cores = n_cores, model = mavm_main_no_se, newdata = these_points, draws = 1000, allow_new_levels = TRUE)
   
   return(these_points)
   
