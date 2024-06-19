@@ -20,7 +20,7 @@ library(mosquitoR)
 library(parallel)
 library(latticeExtra)
 library(BayesPostEst)
-
+library(ggspatial)
 
 # helper functions ####
 
@@ -471,7 +471,7 @@ make_drain_map = function(asdm_data_clean,
   this_p = tm_shape(bcn_census_tract_polygons) +
     tm_polygons(col = "#ffffbb", border.col = "#aaaaaa") + tm_shape(map_data) +
     tm_dots(col = "any_reports", size = .1, pal = this_pal[c(10, 1)]) +
-    tm_layout(frame = FALSE, legend.show = FALSE)
+    tm_layout(frame = FALSE, legend.show = FALSE) + tm_scale_bar(position=c("left", "bottom"))
   
   this_filename = "figures/map_bcn_active_drains.png"
   tmap_save(this_p, this_filename, dpi = 600)
@@ -845,21 +845,21 @@ make_mavm_prediction_figures = function(prediction_points, bcn_perimeter){
   
   these_points$pred_diff_cuts = cut(these_points$pred_diff, breaks = breaks)
   
-  ggplot(bcn_perimeter) + geom_tile(data=these_points, aes(x=x, y=y, fill=pred_diff_cuts)) + scale_fill_manual("Difference", values = cols) + theme_void() + xlab("") + ylab("") + geom_sf(fill=NA)
+  ggplot(bcn_perimeter) + geom_tile(data=these_points, aes(x=x, y=y, fill=pred_diff_cuts)) + scale_fill_manual("Difference", values = cols) + theme_void() + xlab("") + ylab("") + geom_sf(fill=NA) + annotation_scale()
   
   this_filename = "figures/pred_map_diffs.png"
   these_filenames = c(these_filenames, this_filename)
 
     ggsave(this_filename, width=6, height =6, device = png, type = "cairo", dpi = 600)
   
-  ggplot(bcn_perimeter) + geom_tile(data=these_points, aes(x=x, y=y, fill=preds)) + theme_void() + xlab("") + ylab("") + geom_sf(fill=NA) + scale_fill_distiller("Probability", palette = "Spectral", limits = c(0,1))
+  ggplot(bcn_perimeter) + geom_tile(data=these_points, aes(x=x, y=y, fill=preds)) + theme_void() + xlab("") + ylab("") + geom_sf(fill=NA) + scale_fill_distiller("Probability", palette = "Spectral", limits = c(0,1)) + annotation_scale()
   
   this_filename = "figures/pred_map.png"
   these_filenames = c(these_filenames, this_filename)
   
   ggsave(this_filename, width=6, height =6, device = png, type = "cairo", dpi = 600)
   
-  ggplot(bcn_perimeter) + geom_sf(fill="white") + geom_tile(data=these_points, aes(x=x, y=y, fill=preds_no_se)) + theme_void() + xlab("") + ylab("") + geom_sf(fill=NA)  + scale_fill_distiller("Probability", palette = "Spectral", limits = c(0,1))
+  ggplot(bcn_perimeter) + geom_sf(fill="white") + geom_tile(data=these_points, aes(x=x, y=y, fill=preds_no_se)) + theme_void() + xlab("") + ylab("") + geom_sf(fill=NA)  + scale_fill_distiller("Probability", palette = "Spectral", limits = c(0,1)) + annotation_scale()
   
   this_filename = "figures/pred_map_no_se.png"
   these_filenames = c(these_filenames, this_filename)
@@ -907,7 +907,7 @@ make_trap_map = function(bcn_bg_traps, bcn_census_tract_polygons){
   this_p = tm_shape(bcn_census_tract_polygons) + 
     tm_polygons(col = "#ffffbb", border.col = "#aaaaaa") + tm_shape(bcn_bg_traps %>% dplyr::select(trap_name_lon_lat) %>% distinct()) + 
     tm_dots(col = "#006d2c", size = .1) +
-    tm_layout(frame = FALSE, legend.show = FALSE)
+    tm_layout(frame = FALSE, legend.show = FALSE) + tm_scale_bar(position=c("left", "bottom"))
   
   this_figure = "figures/map_bcn_bg_traps.png"
   tmap_save(this_p, this_figure, dpi=600)
@@ -1422,7 +1422,7 @@ make_descriptive_figures = function(data_clean, bcn_chars, bcn_perimeter_polygon
   this_figure = "figures/bcn_sampling_cells.png"
   these_figures = c(these_figures, this_figure)
   
-  ggplot(sampling_cells_small) + geom_sf()
+  ggplot(sampling_cells_small) + geom_sf() + annotation_scale()
   ggsave(this_figure, width=6, height=6)
   
   
@@ -1430,7 +1430,7 @@ make_descriptive_figures = function(data_clean, bcn_chars, bcn_perimeter_polygon
     tm_polygons(col = "#ffffbb", border.col = "#aaaaaa", lwd = .3)+
     tm_shape(D)+
     tm_dots("presence", col = "#003366", size = .05, border.lwd = 0, alpha = .3 )+
-    tm_layout(frame = FALSE, legend.show = FALSE)
+    tm_layout(frame = FALSE, legend.show = FALSE) + tm_scale_bar(position=c("left", "bottom"))
   
   this_figure = "figures/fig1A.png"
   these_figures = c(these_figures, this_figure)
@@ -1441,7 +1441,7 @@ make_descriptive_figures = function(data_clean, bcn_chars, bcn_perimeter_polygon
   fig1B <- tm_shape(bcn_pop)+
     tm_polygons(col = "inctile", palette = viridisLite::viridis(5), lwd = .3, title = "Income", labels = c("10-19k", "19-22k", "22-25k", "25-29k", "29-51k"))+
     tm_layout(legend.title.size = 1,
-              legend.text.size = .7)
+              legend.text.size = .7) + tm_scale_bar(position=c("left", "top"))
   
   this_figure = "figures/fig1B.png"
   these_figures = c(these_figures, this_figure)
@@ -1451,7 +1451,7 @@ make_descriptive_figures = function(data_clean, bcn_chars, bcn_perimeter_polygon
   fig1C <- tm_shape(bcn_pop)+
     tm_polygons(col = "singletile", palette = viridisLite::viridis(5), lwd = .3, title = "% One-person households", labels = c("16-28", "28-31", "31-34", "34-37", "37-48"))+
     tm_layout(legend.title.size = .89,
-              legend.text.size = .7)
+              legend.text.size = .7) + tm_scale_bar(position=c("left", "bottom"))
   
   this_figure = "figures/fig1C.png"
   these_figures = c(these_figures, this_figure)
@@ -1461,7 +1461,7 @@ make_descriptive_figures = function(data_clean, bcn_chars, bcn_perimeter_polygon
   fig1D <- tm_shape(bcn_pop)+
     tm_polygons(col = "popdtile", palette = viridisLite::viridis(5), lwd = .3, title = "Population density", labels = c("1-222", "222-358", "358-460", "460-598", "598-1553"))+
     tm_layout(legend.title.size = 1,
-              legend.text.size = .7)
+              legend.text.size = .7) + tm_scale_bar(position=c("left", "bottom"))
   
   this_figure = "figures/fig1D.png"
   these_figures = c(these_figures, this_figure)
