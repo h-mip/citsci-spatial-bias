@@ -1082,11 +1082,11 @@ make_mtvm_comparison_loos = function(mtvm_comparisons){
 # MTVM comparison Bayes R sq ####
 make_mtvm_comparison_br2s = function(mtvm_comparisons){
   
-  n_cores = min(length(mtvm_comparisons), parallel::detectCores())
+#  n_cores = min(length(mtvm_comparisons), parallel::detectCores())
   
-  bind_rows(mclapply(1:length(mtvm_comparisons), function(i){
+  bind_rows(lapply(1:length(mtvm_comparisons), function(i){
     as_tibble(bayes_R2(mtvm_comparisons[[i]])) %>% mutate(model=names(mtvm_comparisons)[i])
-  }, mc.cores = n_cores))
+  }))
   
 }
 
