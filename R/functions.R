@@ -380,6 +380,18 @@ return(M)
 
 }
 
+# plot PP check Main GPM ####
+
+plot_pp_check_gpm_main = function(gpm_main){
+  
+  this_filename = paste0("figures/pp_check_gpm_main.png")
+  p = pp_check(gpm_main, type = "bars", ndraws = 100)
+  ggsave(plot = p, filename = this_filename, width=8, height = 8)
+  
+  return(this_filename)
+  
+} 
+
 # Main GPM Conditional Effects Plot ####
 
 plot_gpm_main_ces = function(gpm_main){
@@ -493,6 +505,19 @@ n_iters = 2000
 brm(any_reports ~  SE_expected + poly(mean_rent_consumption_unit, 2) + log(popd) + p_singlehh + mean_age + (1 | id_item), data = drains_activity_yearly_buff200, family = bernoulli(link = "logit"), chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = n_threads, iter = 2000, silent = 0, control = list(adapt_delta = 0.97))
 
 }
+
+# plot PP Check ASDM Main ####
+
+plot_pp_check_asdm_main = function(asdm_main){
+  
+  this_filename = paste0("figures/pp_check_asdm_main.png")
+  p = pp_check(asdm_main, type = "bars", ndraws = 100)
+  ggsave(plot = p, filename = this_filename, width=8, height = 8)
+  
+  return(this_filename)
+  
+} 
+
 
 # plot ASDM CESs ####
 plot_asdm_ces = function(model, name){
@@ -732,6 +757,19 @@ fit_mavm_main = function(mavm_data_clean){
 }
 
 
+# plot PP Check MAVM Main ####
+
+plot_pp_check_mavm_main = function(mavm_main){
+  
+  this_filename = paste0("figures/pp_check_mavm_main.png")
+  p = pp_check(mavm_main, type = "bars", ndraws = 100)
+  ggsave(plot = p, filename = this_filename, width=8, height = 8)
+  
+  return(this_filename)
+  
+} 
+
+
 # plot MAVM CEs ####
 plot_mavm_ces = function(model) {
   these_variables = tibble(
@@ -940,6 +978,20 @@ fit_mtvm_main = function(bcn_bg_traps, bcn_chars, census_tracts_merged, ndvi){
   
 }
 
+
+# plot PP Check MTVM Main ####
+
+plot_pp_check_mtvm_main = function(mtvm_main){
+  
+  this_filename = paste0("figures/pp_check_mtvm_main.png")
+  p = pp_check(mtvm_main, ndraws = 100)
+  ggsave(plot = p, filename = this_filename, width=8, height = 8)
+  
+  return(this_filename)
+  
+} 
+
+
 # plot MTVM CEs and comparisons ####
 plot_mtvm_ces_plus_comparison = function(mtvm_main, mavm_main){
   
@@ -1054,12 +1106,9 @@ fit_mtvm_comparisons = function(mtvm_main){
   
   M2 = brm(bf(females ~ poly(meanTM30,2) + (1 | trap_name), zi ~ poly(meanTM30,2) ), data=D, family = zero_inflated_poisson(), prior = set_prior("normal(0,1)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
 
-  M5 = brm(females ~ poly(mean_rent_consumption_unit,2) + (1 | trap_name), data=D, family = zero_inflated_poisson(), prior = set_prior("normal(0,1)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
-  
-    
   M1 = brm(females ~ poly(meanTM30,2) + poly(mean_rent_consumption_unit,2) + (1 | trap_name), data=D, family = poisson(), prior = set_prior("normal(0,1)", class="b"), iter = 2000, chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threading(threads_per_chain), control = list(adapt_delta = 0.97), silent = 0, save_pars = save_pars(all = TRUE))
   
-  models = list("MTVM1" = M1, "MTVM2" = M2, "MTVM3" = M3, "MTVM4" = M4, "MTVM5" = M5)
+  models = list("MTVM1" = M1, "MTVM2" = M2, "MTVM3" = M3, "MTVM4" = M4)
   
 return(models)
 }
@@ -1113,9 +1162,9 @@ make_mtvm_comparison_table = function(mtvm_comparisons, mtvm_comparison_loos, mt
   
   these_gof_names = lapply(1:length(models), function(x){ return(c("Bayes R-sq.", "SE Bayes R-sq.", "ELPD", "SE ELPD"))})
   
-  these_coef_names = list(c("Int.",  "TMP", "TMP sq.", "INC", "INC sq." ),  c("Int.",  "TMP", "TMP sq.", "ZI Int.", "ZI TMP", "ZI TMP sq."), c("Int.",  "TMP", "TMP sq.", "INC", "INC sq.", "ZI Int.", "ZI TMP", "ZI TMP sq."),  c("Int.",  "TMP", "TMP sq.", "INC", "INC sq.", "ZI Int.", "ZI TMP", "ZI TMP sq."),  c("Int.", "INC", "INC sq."))
+  these_coef_names = list(c("Int.",  "TMP", "TMP sq.", "INC", "INC sq." ),  c("Int.", "ZI Int.",  "TMP", "TMP sq.", "ZI TMP", "ZI TMP sq."), c("Int.", "ZI Int.", "TMP", "TMP sq.", "INC", "INC sq.",  "ZI TMP", "ZI TMP sq."),  c("Int.", "ZI Int.", "TMP", "TMP sq.", "INC", "INC sq.",  "ZI TMP", "ZI TMP sq."))
   
-  cust_rows = list("Random Intercepts" = c("trap", "trap", "none", "trap", "trap"), "Distribution" = c("Poisson", "ZI Poisson", "ZI Poisson", "ZI Poisson", "ZI Poisson"), Observations = rep(N, length(models)))
+  cust_rows = list("Random Intercepts" = c("trap", "trap", "none", "trap"), "Distribution" = c("Poisson", "ZI Poisson", "ZI Poisson", "ZI Poisson"), Observations = rep(N, length(models)))
   
   this_filename = "figures/mosquito_trap_vector_model_table.tex"
   
@@ -1232,7 +1281,7 @@ fit_asdm_comparisons = function(asdm_main){
   
   M1 = brm(any_reports ~ poly(mean_rent_consumption_unit, 2) + (1 | id_item), data = D, family = bernoulli(link = "logit"), chains=n_chains, cores=n_chains, backend = "cmdstanr", threads = threads_per_chain, iter = 2000, silent = 0, control = list(adapt_delta = 0.97), save_pars = save_pars(all = TRUE))
   
-  models = list("ASDPM1" = M1, "ASDPM2" = M2, "ASDPM3" = M3, "ASDPM4" = M4, "ASDPM5" = M5, "ASDPM6" = M6)
+  models = list("ACBDPM1" = M1, "ACBDPM2" = M2, "ACBDPM3" = M3, "ACBDPM4" = M4, "ACBDPM5" = M5, "ACBDPM6" = M6)
   
   return(models)
   
@@ -1329,11 +1378,9 @@ fit_gpm_comparisons = function(gpm_main){
 # GPM comparison loos ####
 make_gpm_comparison_loos = function(gpm_comparisons){
   
-  n_cores = min(length(gpm_comparisons), parallel::detectCores())
-  
-  loos = mclapply(gpm_comparisons, function(M){
+  loos = lapply(gpm_comparisons, function(M){
     loo(M)
-  }, mc.cores = n_cores)
+  })
   
   names(loos) = names(gpm_comparisons)
   
@@ -1344,11 +1391,9 @@ make_gpm_comparison_loos = function(gpm_comparisons){
 # GPM comparison BR2s ####
 make_gpm_comparison_br2s = function(gpm_comparisons){
   
-  n_cores = min(length(gpm_comparisons), parallel::detectCores())
-  
-  bind_rows(mclapply(1:length(gpm_comparisons), function(i){
+  bind_rows(lapply(1:length(gpm_comparisons), function(i){
     as_tibble(bayes_R2(gpm_comparisons[[i]])) %>% mutate(model=names(gpm_comparisons)[i])
-  }, mc.cores = n_cores))
+  }))
   
 }
 

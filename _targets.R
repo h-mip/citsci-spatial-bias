@@ -315,8 +315,24 @@ list(
   tar_target(
     colinearity_asdm,
     check_colinearity_asdm(asdm_data_clean)
+  ),
+  ## PP check Figures ####
+  tar_target(
+    ppc_check_mtvm_main,
+    plot_pp_check_mtvm_main(mtvm_main)
+  ),
+  tar_target(
+    ppc_check_mavm_main,
+    plot_pp_check_mavm_main(mavm_main)
+  ),
+  tar_target(
+    ppc_check_asdm_main,
+    plot_pp_check_asdm_main(asdm_main)
+  ),
+  tar_target(
+    ppc_check_gpm_main,
+    plot_pp_check_gpm_main(gpm_main)
   )
-  
 )
 
 # visNetwork::visSave(tar_visnetwork(), file = "visnetwork.html")
